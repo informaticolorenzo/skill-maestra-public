@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HyperFrames — Skill Maestra</title>
+  <!-- Pagina mantenida a mano (no la genera ningun script). La portada (index.html) agrupa
+       todas las skills de HyperFrames en una sola tarjeta que enlaza aqui; la lista de skills
+       del grupo sale del registro de instalacion ~/.agents/.skill-lock.json (skills con origen
+       heygen-com/hyperframes); el generador las agrupa solo. Si se instala o cambia una skill de
+       HyperFrames, revisar esta pagina a mano. Estilo y buscador copiados de trucos.html. -->
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 10% 0%, #e8f0ff 0%, #f5f7fb 40%);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: #1f2937;
+      padding: 20px;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    .header { text-align: center; margin-bottom: 28px; }
+
+    h1 { font-size: 2.5rem; margin: 0 0 10px 0; color: #0f3460; }
+
+    .subtitle { font-size: 1.1rem; color: #6b7280; margin: 0; line-height: 1.5; }
+    .subtitle a { color: #0f3460; }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 16px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #1f2937;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .back-btn:hover { border-color: #0f3460; background: #f0f9ff; }
+
+    /* Buscador: copiado de trucos.html */
+    .search-wrap { position: relative; margin-bottom: 20px; }
+    .search-input {
+      width: 100%; padding: 12px 16px 12px 42px; border-radius: 12px;
+      border: 1.5px solid #d7e1ef; font-size: 0.95rem; background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .search-input:focus { border-color: #0f3460; box-shadow: 0 0 0 3px rgba(15,52,96,0.12); outline: none; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: .45; pointer-events: none; }
+    .search-count { font-size: 0.78rem; color: #6b7280; margin: -10px 0 18px 2px; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+    .chip {
+      display: inline-block;
+      text-decoration: none;
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      color: #0f3460;
+      background: #f8fbff;
+      transition: all .2s ease;
+    }
+    .chip:hover { background: #e8f1ff; border-color: #0f3460; }
+
+    .category { margin-bottom: 40px; scroll-margin-top: 16px; }
+
+    h2 {
+      font-size: 1.5rem;
+      padding: 12px 20px;
+      border-radius: 10px;
+      margin: 0 0 12px 0;
+      font-weight: 600;
+    }
+
+    .category.idea h2 { background: #ffe4d6; color: #9a3412; }
+    .category.flujos h2 { background: #dbeafe; color: #1e40af; }
+    .category.especialistas h2 { background: #dcfce7; color: #166534; }
+    .category.confusiones h2 { background: #fef3c7; color: #78350f; }
+    .category.sonido h2 { background: #ddd6fe; color: #5b21b6; }
+    .category.contar h2 { background: #e0f2fe; color: #075985; }
+
+    .category-note { margin: 0 0 16px 4px; font-size: 0.88rem; color: #6b7280; line-height: 1.5; }
+
+    .trucos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+      gap: 16px;
+    }
+
+    .truco {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      min-width: 0;
+    }
+    .truco:hover {
+      border-color: #0f3460;
+      box-shadow: 0 4px 12px rgba(15,52,96,0.15);
+      transform: translateY(-2px);
+    }
+    .truco.ancho { grid-column: 1 / -1; }
+    .truco.ancho:hover { transform: none; }
+
+    .truco-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .truco h3 { margin: 0; font-size: 1.02rem; color: #0f3460; line-height: 1.35; }
+    .truco h3 code { font-size: 0.9rem; }
+
+    .badge {
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #166534;
+      white-space: nowrap;
+    }
+
+    .truco p, .truco li, .truco td, .truco th { color: #4b5563; font-size: 0.9rem; line-height: 1.55; }
+    .truco p { margin: 0 0 8px 0; }
+    .truco ul, .truco ol { margin: 0 0 8px 0; padding-left: 20px; }
+    .truco li { margin-bottom: 4px; }
+
+    .para::before { content: "Para qué: "; font-weight: 700; color: #0f3460; }
+    .entra::before { content: "Le das: "; font-weight: 700; color: #0f3460; }
+    .sale::before { content: "Te devuelve: "; font-weight: 700; color: #0f3460; }
+    .no::before { content: "No es para: "; font-weight: 700; color: #9a3412; }
+
+    .analogia {
+      background: #f8fafc;
+      border-left: 3px solid #94a3b8;
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+      font-style: italic;
+    }
+
+    .ojo {
+      background: #fff7ed;
+      border-left: 3px solid #f59e0b;
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .tabla-wrap { overflow-x: auto; margin: 0 0 8px 0; }
+    table { border-collapse: collapse; width: 100%; min-width: 520px; }
+    th, td { text-align: left; vertical-align: top; padding: 7px 10px; border-bottom: 1px solid #e5e7eb; }
+    th { background: #f1f5f9; color: #0f3460 !important; font-weight: 600; }
+    tr:last-child td { border-bottom: none; }
+
+    code, kbd { font-family: Consolas, "Courier New", monospace; font-size: 0.82rem; }
+    code {
+      background: #f1f5f9;
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: #0f172a;
+      word-break: break-word;
+    }
+
+    .code-wrap { position: relative; margin: 0 0 8px 0; }
+    pre {
+      margin: 0;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 34px 14px 12px 14px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 0.72rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: #e2e8f0;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: #334155; }
+
+    /* Esquema de las tres capas */
+    .capas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 10px; margin: 6px 0 10px 0; }
+    .capa { border-radius: 8px; padding: 10px 12px; font-size: 0.88rem; line-height: 1.45; color: #1f2937; }
+    .capa strong { display: block; margin-bottom: 2px; }
+    .capa.c1 { background: #ffedd5; }
+    .capa.c2 { background: #dbeafe; }
+    .capa.c3 { background: #dcfce7; }
+
+    .sin-resultados { display: none; text-align: center; color: #6b7280; padding: 30px 0; }
+
+    .pie {
+      margin-top: 20px;
+      background: white;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 16px 20px;
+      color: #4b5563;
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+    .pie h2 { background: none; padding: 0; font-size: 1.1rem; color: #0f3460; margin-bottom: 8px; }
+    .pie p { margin: 0 0 6px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="./index.html" class="back-btn">← Volver al índice</a>
+
+    <div class="header">
+      <h1>🎬 HyperFrames</h1>
+      <p class="subtitle">Las 22 skills para hacer vídeos con IA: qué hace cada una, en qué se diferencian a la hora de hacer un vídeo,<br>
+        y qué se puede elegir de voz, música y volumen. Pensado para poder explicarlo a otras personas.</p>
+    </div>
+
+    <div class="search-wrap">
+      <span class="search-icon">🔎</span>
+      <input type="text" class="search-input" id="buscar" placeholder="Buscar (ej: subtítulos, voz, música, zoom, promo, volumen, presentación...)">
+    </div>
+    <div class="search-count" id="contador"></div>
+
+    <nav class="chips" aria-label="Secciones">
+      <a class="chip" href="#idea">🚪 Cómo funciona</a>
+      <a class="chip" href="#flujos">🎬 Qué vídeo quieres</a>
+      <a class="chip" href="#especialistas">🧰 Los especialistas</a>
+      <a class="chip" href="#confusiones">🔀 Las que más se confunden</a>
+      <a class="chip" href="#sonido">🎙️ Voz, música y volumen</a>
+      <a class="chip" href="#contar">📣 Contarlo en 30 segundos</a>
+    </nav>
+
+    <!-- ============ COMO FUNCIONA ============ -->
+    <section class="category idea" id="idea">
+      <h2>🚪 Cómo funciona</h2>
+      <div class="trucos-grid">
+
+        <article class="truco ancho">
+          <div class="truco-head"><h3>La idea: una productora de vídeo con recepción, equipos y técnicos</h3></div>
+          <p>HyperFrames convierte una <strong>página web en vídeo</strong>: la IA escribe una página (HTML) que dice qué aparece en pantalla y en qué segundo, y HyperFrames la "graba" fotograma a fotograma hasta sacar un MP4. Sus skills están organizadas en tres capas:</p>
+          <p class="analogia">Piensa en una productora. En recepción te preguntan qué necesitas y te pasan al equipo que hace ese tipo de vídeo. Ese equipo se encarga del vídeo de principio a fin y, cuando le hace falta, llama a los técnicos: sonido, cámara, dirección de arte, almacén...</p>
+          <div class="capas">
+            <div class="capa c1"><strong>1 · Recepción (1 skill)</strong><code>hyperframes</code>: escucha qué quieres y elige el equipo. Siempre se empieza por aquí.</div>
+            <div class="capa c2"><strong>2 · Equipos (10 skills)</strong>Uno por <em>tipo de vídeo</em>: promo, explicativo, subtítulos, presentación... Cada uno es dueño del vídeo entero.</div>
+            <div class="capa c3"><strong>3 · Técnicos (10 skills)</strong>Uno por <em>oficio</em>: animación, cámara, sonido, recursos... Nunca se quedan con el vídeo: ayudan al equipo.</div>
+          </div>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3><code>hyperframes</code> — la recepción</h3><span class="badge">Lo usamos</span></div>
+          <p class="para">no tener que saber qué skill toca. Le pides el vídeo y ella decide.</p>
+          <ol>
+            <li>Mira si ya hay un proyecto empezado (y lo retoma) o si es un vídeo nuevo.</li>
+            <li>Si es nuevo, te hace una pequeña entrevista: de qué va, para quién, cuánto dura, qué tiene que salir sí o sí.</li>
+            <li>Lo deja escrito en un archivo <code>BRIEF.md</code> (el "encargo").</li>
+            <li>Elige el equipo (uno de los 10 tipos de vídeo), lo instala o actualiza y le pasa el encargo.</li>
+          </ol>
+          <p class="ojo">Si solo pides una operación sobre un proyecto ya hecho (renderizar, validar, publicar) no hace entrevista: va directa a la consola (<code>hyperframes-cli</code>).</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>Cómo se pide un vídeo, paso a paso</h3></div>
+          <ol>
+            <li>Escribe <code>/hyperframes</code> y di qué quieres, con lo que tengas: una URL, un texto, un vídeo grabado, una canción, una PR de GitHub, un diseño de Figma...</li>
+            <li>Contesta la entrevista (o di "decide tú").</li>
+            <li>El equipo propone guion y storyboard; lo revisas antes de que construya.</li>
+            <li>Construye, valida (<code>check</code>) y te enseña una vista previa.</li>
+            <li>Renderiza el MP4 cuando le des el visto bueno.</li>
+          </ol>
+          <p class="ojo">Los equipos especializados rinden mejor entre 30 y 90 segundos y llegan hasta unos 3 minutos. Un vídeo claramente más largo va al equipo "a medida" (<code>general-video</code>).</p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============ FLUJOS ============ -->
+    <section class="category flujos" id="flujos">
+      <h2>🎬 Qué vídeo quieres: los 10 equipos</h2>
+      <p class="category-note">La diferencia entre ellos es <strong>lo que les das</strong> y <strong>lo que sale</strong>. La recepción los prueba en este orden y se queda con el primero que encaja; manda el tipo de vídeo que pides, no una palabra suelta de la petición.</p>
+      <div class="trucos-grid">
+
+        <article class="truco ancho">
+          <div class="truco-head"><h3>Tabla rápida: tengo esto, quiero esto → equipo</h3></div>
+          <div class="tabla-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Tienes / quieres</th><th>Equipo (skill)</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>Un vídeo hecho en Remotion y quieres pasarlo a HyperFrames</td><td><code>remotion-to-hyperframes</code></td></tr>
+                <tr><td>2</td><td>Una presentación o pitch con diapositivas</td><td><code>slideshow</code></td></tr>
+                <tr><td>3</td><td>Un vídeo de alguien hablando a cámara + subtítulos</td><td><code>embedded-captions</code></td></tr>
+                <tr><td>4</td><td>Una entrevista o podcast + rótulos y tarjetas gráficas</td><td><code>talking-head-recut</code></td></tr>
+                <tr><td>5</td><td>Una canción que marque el ritmo del vídeo</td><td><code>music-to-video</code></td></tr>
+                <tr><td>6</td><td>Una pieza muy corta, sin voz, donde el movimiento es el mensaje</td><td><code>motion-graphics</code></td></tr>
+                <tr><td>7</td><td>Una pull request de GitHub que explicar</td><td><code>pr-to-video</code></td></tr>
+                <tr><td>8</td><td>Una web, app o producto que promocionar o enseñar</td><td><code>product-launch-video</code></td></tr>
+                <tr><td>9</td><td>Un texto, artículo o tema que explicar, sin web ni grabación</td><td><code>faceless-explainer</code></td></tr>
+                <tr><td>10</td><td>Cualquier otra cosa, o algo largo</td><td><code>general-video</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🛍️ <code>product-launch-video</code> — Promo de producto</h3></div>
+          <p class="entra">la URL de una web, app o empresa; o un guion o encargo comercial.</p>
+          <p class="sale">un vídeo de lanzamiento, promo, demo de una función o recorrido por la web.</p>
+          <p>Es la opción por defecto ante cualquier URL comercial. Captura la web real y la enseña.</p>
+          <p class="no">explicar un tema sin web (eso es <code>faceless-explainer</code>).</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>📚 <code>faceless-explainer</code> — Vídeo explicativo sin cámara</h3></div>
+          <p class="entra">un texto, artículo, apuntes o simplemente un tema.</p>
+          <p class="sale">un vídeo explicativo con imágenes <em>inventadas</em> escena a escena: tipografía, gráficos, diagramas, datos.</p>
+          <p>Para "qué es...", "cómo se hace...", listas tipo "5 claves de...".</p>
+          <p class="no">enseñar una web o producto real (eso es <code>product-launch-video</code>).</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>💻 <code>pr-to-video</code> — Explicar un cambio de código</h3></div>
+          <p class="entra">una pull request de GitHub (enlace, <code>usuario/repo#12</code> o "esta PR").</p>
+          <p class="sale">un vídeo que explica la novedad, el arreglo o la reorganización, construido a partir del diff y los commits.</p>
+          <p class="no">promocionar el producto ni explicar un tema sin PR.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🗣️ <code>embedded-captions</code> — Subtítulos</h3></div>
+          <p class="entra">un vídeo ya grabado de una persona hablando (un solo plano).</p>
+          <p class="sale">el mismo vídeo, sin tocarlo, con subtítulos. Hay 35 estilos: 10 "de cine", con el texto integrado en la escena, y 25 temáticos, entre ellos el discreto que sale por defecto (una línea abajo). Los de cine, con las palabras detrás de la persona, solo si se piden.</p>
+          <p>Lo hace todo en local, también la transcripción. Si el vídeo tiene varios planos, hay que cortarlo antes.</p>
+          <p class="no">añadir tarjetas o rótulos de diseño (eso es <code>talking-head-recut</code>).</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🎙️ <code>talking-head-recut</code> — Gráficos sobre una entrevista</h3></div>
+          <p class="entra">una entrevista, podcast o vídeo con presentador.</p>
+          <p class="sale">el vídeo intacto debajo y, encima, tarjetas sincronizadas con lo que se dice: títulos animados, rótulos con el nombre, datos, citas, paneles laterales, imagen dentro de imagen. En 16:9, 9:16 o 4:5.</p>
+          <p class="no">subtítulos sin más (<code>embedded-captions</code>) ni cortar o reordenar el vídeo (<code>general-video</code>).</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🎵 <code>music-to-video</code> — Vídeo al ritmo de una canción</h3></div>
+          <p class="entra">una canción (archivo, un vídeo del que sacar el audio, o generada a partir de un ambiente).</p>
+          <p class="sale">un vídeo donde todo va al compás: vídeo con letra, pase de fotos o promo cinética. Puede hacerse sin aportar ninguna imagen.</p>
+          <p class="no">un vídeo con voz en off; si la música solo va de fondo, manda el tema del vídeo, no la música.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>✨ <code>motion-graphics</code> — Pieza corta animada</h3></div>
+          <p class="entra">una idea muy concreta: un dato, un logo, un título, un mapa, un tuit, una gráfica.</p>
+          <p class="sale">una pieza de menos de 10 s (hasta unos 30), sin voz ni personas: tipografía en movimiento, contador de cifras, logo animado, rótulo, mapa que se ilumina. En MP4 o con fondo transparente para ponerla encima de otro vídeo.</p>
+          <p class="no">algo con voz, largo o de varias escenas (<code>general-video</code>).</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🖥️ <code>slideshow</code> — Presentación interactiva</h3></div>
+          <p class="entra">un tema, un guion o una página que convertir en diapositivas.</p>
+          <p class="sale"><strong>no un MP4</strong>: una presentación navegable, con apariciones paso a paso, saltos entre diapositivas, zonas clicables y modo presentador con notas.</p>
+          <p class="ojo">Si no has dicho claramente "presentación", te lo confirma antes de empezar.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🔁 <code>remotion-to-hyperframes</code> — Pasar de Remotion</h3></div>
+          <p class="entra">el código de un vídeo hecho con Remotion (otra herramienta de vídeo con React).</p>
+          <p class="sale">el mismo vídeo traducido a HyperFrames. Solo en esa dirección.</p>
+          <p class="no">"hazme algo parecido a mi vídeo de Remotion": eso es un vídeo nuevo (<code>general-video</code>).</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🧩 <code>general-video</code> — A medida</h3></div>
+          <p class="para">todo lo que no encaja en los otros nueve.</p>
+          <p>Vídeos largos o de muchas escenas, montajes, vídeos de marca, títulos fijos, bucles, y cualquier edición de metraje: recortar, reordenar, cambiar el color o el encuadre.</p>
+          <p>También es el equipo que coordina los cambios sobre un proyecto ya hecho ("haz zoom aquí", "baja la música").</p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============ ESPECIALISTAS ============ -->
+    <section class="category especialistas" id="especialistas">
+      <h2>🧰 Los especialistas: los 10 técnicos</h2>
+      <p class="category-note">No hacen vídeos por su cuenta: el equipo los llama según lo que necesite. Casi nunca hace falta pedirlos por su nombre.</p>
+      <div class="trucos-grid">
+
+        <article class="truco">
+          <div class="truco-head"><h3>📐 <code>hyperframes-core</code> — El reglamento</h3></div>
+          <p class="analogia">La partitura: dice qué suena, cuándo y en qué pista.</p>
+          <p>Las reglas del archivo: qué aparece y en qué segundo, las pistas, las escenas dentro de escenas, las variables y las normas para que el vídeo salga idéntico cada vez que se renderiza. También cómo cortar, recortar o reordenar clips.</p>
+          <p>Se lee siempre antes de escribir el vídeo.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>💃 <code>hyperframes-animation</code> — El coreógrafo</h3></div>
+          <p>Decide <em>cómo se mueve</em> cada cosa: reglas de movimiento, escenas tipo de varias fases, transiciones, 24 efectos de texto con nombre propio y los 7 motores de animación (GSAP por defecto, Lottie, Three.js, Anime.js, CSS, Web Animations y TypeGPU).</p>
+          <p>También revisa la coreografía de un vídeo ya hecho.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🎥 <code>hyperframes-keyframes</code> — El operador de cámara</h3></div>
+          <p>Zooms, acercar o alejar de golpe, reencuadres, el efecto "Ken Burns" sobre fotos, movimientos de cámara, transiciones de barrido y profundidad 3D.</p>
+          <p>Su obsesión: que puedas saltar a cualquier segundo del vídeo y se vea exactamente igual que reproduciéndolo de seguido.</p>
+          <p class="no">decidir la estrategia de la escena, la marca o los subtítulos.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🎨 <code>hyperframes-creative</code> — El director de arte</h3></div>
+          <p>Todo lo que <em>no</em> es movimiento: la ficha de diseño, paleta de colores, tipografías, el guion de la narración, el reparto del ritmo en "golpes", imágenes que reaccionan a la música, y las decisiones de marca y estilo.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🎚️ <code>hyperframes-audio</code> — El técnico de mezcla</h3></div>
+          <p>Con el sonido <em>ya colocado</em>: fundidos, volumen, que la música se aparte cuando habla la voz, efectos (ecualizador, compresor, reverberación...) y curvas de volumen a lo largo del tiempo. Detalle en <a href="#sonido">Voz, música y volumen</a>.</p>
+          <p class="no">conseguir la música o generar la voz (<code>media-use</code>) ni colocar los clips (<code>hyperframes-core</code>).</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>📦 <code>media-use</code> — El almacén</h3></div>
+          <p>Consigue cualquier recurso: música, efectos de sonido, imágenes, iconos, logos de marca, voz en off, corrección de color. Si no lo encuentra, lo genera (voz, música, imagen). También transcribe, hace subtítulos, quita fondos y recorta o reencuadra material.</p>
+          <p>Es a quien se llama con quejas tipo "esta imagen se ve oscura, plana, sosa" o "quiero que parezca de cámara antigua".</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🗂️ <code>hyperframes-registry</code> — El catálogo de piezas hechas</h3></div>
+          <p>Unas 400 piezas prefabricadas: efecto glitch, líneas de televisión antigua, grano de película, brillo que barre, confeti, gráficas, ventanas de código, mapas, transiciones.</p>
+          <p class="ojo">Regla: si en el encargo aparece un efecto con nombre, se busca aquí <strong>antes</strong> de construirlo a mano. Buscar no exige proyecto ni cuenta.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>⌨️ <code>hyperframes-cli</code> — La consola</h3></div>
+          <p>Las órdenes de la herramienta: crear proyecto (<code>init</code>), validar (<code>check</code>), vista previa (<code>preview</code>), renderizar en tu PC o en la nube (HeyGen, AWS Lambda o Google Cloud Run), publicar, transcribir, generar voz, quitar fondos, revisar el historial...</p>
+          <p>Y diagnosticar por qué falla un render.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🎞️ <code>hyperframes-studio</code> — El ayudante de la sala de montaje</h3></div>
+          <p>Para trabajar con una persona en HyperFrames Studio (el editor visual). Primero distingue si le piden un cambio o solo una pregunta o idea ("no toques nada" = respuesta y plan, no edición).</p>
+          <p>Y marca cómo ordenar la línea de tiempo para que se entienda: una pista de subtítulos, un tipo de elemento por pista, cada escena por separado y zonas seguras para el texto.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🖌️ <code>figma</code> — El puente con Figma</h3></div>
+          <p>Trae al vídeo lo que hay en Figma: imágenes, colores y tipografías de marca, componentes, y marcos de un storyboard que convierte en movimiento (los lee como estados de una animación, no como diapositivas).</p>
+          <p>Se activa al pegar un enlace de <code>figma.com</code>.</p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============ CONFUSIONES ============ -->
+    <section class="category confusiones" id="confusiones">
+      <h2>🔀 Las que más se confunden</h2>
+      <div class="trucos-grid">
+
+        <article class="truco">
+          <div class="truco-head"><h3>Pieza corta animada o vídeo a medida</h3></div>
+          <p><code>motion-graphics</code>: corta, <strong>sin voz</strong>, y el movimiento es el mensaje (un logo que se monta, una cifra que sube).</p>
+          <p><code>general-video</code>: un título <em>fijo</em>, algo con narración, un montaje largo o un bucle.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>Subtítulos o gráficos sobre una entrevista</h3></div>
+          <p><code>embedded-captions</code>: lo que se dice, escrito.</p>
+          <p><code>talking-head-recut</code>: tarjetas de diseño (nombres, datos, citas).</p>
+          <p>Si además hay que <em>cortar o reordenar</em> el vídeo: <code>general-video</code>.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>Promo, explicativo o PR: depende de lo que les das</h3></div>
+          <p>Una web o producto → <code>product-launch-video</code>.<br>
+             Un texto o un tema → <code>faceless-explainer</code>.<br>
+             Una pull request → <code>pr-to-video</code>.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>Canción que manda o música de fondo</h3></div>
+          <p><code>music-to-video</code> solo si el compás de la canción decide cuándo cambia cada imagen.</p>
+          <p>Si la música solo acompaña, el equipo lo elige el tema del vídeo, y la música la pone <code>media-use</code>.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>Coreógrafo, operador de cámara o director de arte</h3></div>
+          <p><code>hyperframes-animation</code>: qué se mueve y con qué estilo.</p>
+          <p><code>hyperframes-keyframes</code>: zooms y movimientos de cámara, hechos para que no fallen al saltar de segundo.</p>
+          <p><code>hyperframes-creative</code>: lo que no se mueve (colores, letra, guion, ritmo).</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>Conseguir el sonido o mezclarlo</h3></div>
+          <p><code>media-use</code> trae la voz, la música y los efectos.</p>
+          <p><code>hyperframes-audio</code> los mezcla una vez colocados.</p>
+          <p class="analogia">Uno va al mercado; el otro cocina.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>Reglamento o consola</h3></div>
+          <p><code>hyperframes-core</code>: cómo se escribe el vídeo.</p>
+          <p><code>hyperframes-cli</code>: las órdenes que lo validan, previsualizan y renderizan.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>Presentación o vídeo</h3></div>
+          <p><code>slideshow</code> no saca un MP4: saca una presentación que se pasa con el ratón o el teclado, con notas para quien presenta. Todo lo demás saca vídeo.</p>
+        </article>
+
+        <article class="truco ancho">
+          <div class="truco-head"><h3>Cuando pides un cambio, a quién se llama</h3></div>
+          <div class="tabla-wrap">
+            <table>
+              <thead><tr><th>Lo que dices</th><th>Skills que entran</th></tr></thead>
+              <tbody>
+                <tr><td>"Corta este trozo", "pon esto antes"</td><td><code>general-video</code> + <code>hyperframes-core</code></td></tr>
+                <tr><td>"Haz zoom aquí", "movimiento de cámara", efecto Ken Burns</td><td><code>general-video</code> + <code>hyperframes-core</code> + <code>hyperframes-keyframes</code></td></tr>
+                <tr><td>"Transición de barrido" o corte que encaja dos planos</td><td><code>general-video</code> + <code>hyperframes-animation</code> + <code>hyperframes-keyframes</code> + <code>hyperframes-registry</code></td></tr>
+                <tr><td>"Fundido", "baja la música cuando hable", "añade eco"</td><td><code>general-video</code> + <code>hyperframes-core</code> + <code>hyperframes-audio</code></td></tr>
+                <tr><td>"Ordena el proyecto para verlo bien en Studio"</td><td><code>hyperframes-studio</code> + <code>hyperframes-core</code></td></tr>
+                <tr><td>"Búscame música", "genera la voz", "esta foto se ve sosa"</td><td><code>media-use</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============ SONIDO ============ -->
+    <section class="category sonido" id="sonido">
+      <h2>🎙️ Voz, música y volumen: lo que se puede elegir</h2>
+      <p class="category-note">La voz, la música y los efectos los consigue <code>media-use</code>; la mezcla la hace <code>hyperframes-audio</code>. Antes de generar voz o música, la skill pregunta si inicias sesión en HeyGen (mejores voces y biblioteca de música) o sigues sin conexión con lo local; no elige por ti en silencio.</p>
+      <div class="trucos-grid">
+
+        <article class="truco ancho">
+          <div class="truco-head"><h3>🗣️ Quién pone la voz: cuatro opciones</h3></div>
+          <div class="tabla-wrap">
+            <table>
+              <thead><tr><th>Proveedor</th><th>Qué necesita</th><th>Lo bueno</th><th>A tener en cuenta</th></tr></thead>
+              <tbody>
+                <tr><td><strong>HeyGen</strong></td><td>Iniciar sesión (<code>npx hyperframes auth login</code>) o clave de API</td><td>La mejor calidad y, en la misma llamada, el segundo exacto de cada palabra (subtítulos perfectos sin transcribir)</td><td>Con sesión iniciada hay 10 min/mes gratis; con clave de API se paga por uso</td></tr>
+                <tr><td><strong>ElevenLabs</strong></td><td>Clave de API</td><td>Catálogo de voces enorme</td><td>No da los tiempos por palabra: hay que transcribir después</td></tr>
+                <tr><td><strong>Gemini</strong> (Google)</td><td>Clave de Google</td><td>Voces predefinidas (por defecto "Kore") y se le puede <em>dirigir</em> con palabras: "cálida, clara, con una pausa entre frases"</td><td>Solo si lo pides expresamente. Las indicaciones de estilo van aparte del texto; conviene comprobar que no se hayan leído en voz alta</td></tr>
+                <tr><td><strong>Kokoro</strong></td><td>Nada: funciona en tu PC, sin internet</td><td>Gratis, rápido, 54 voces y varios idiomas</td><td>Calidad algo menor; para español hace falta <code>espeak-ng</code> instalado</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🎭 Tipo de voz</h3></div>
+          <p>En Kokoro, la primera letra del nombre de la voz marca el idioma: <code>e</code> español (<code>ef_dora</code>), <code>a</code> inglés americano, <code>b</code> británico, <code>f</code> francés, <code>i</code> italiano, <code>p</code> portugués de Brasil, <code>j</code> japonés, <code>z</code> chino, <code>h</code> hindi.</p>
+          <p>Voces recomendadas según el vídeo (en inglés):</p>
+          <ul>
+            <li>Demo de producto: <code>af_heart</code>, <code>af_nova</code></li>
+            <li>Tutorial: <code>am_adam</code>, <code>bf_emma</code></li>
+            <li>Promo: <code>af_sky</code>, <code>am_michael</code></li>
+            <li>Documentación: <code>bf_emma</code>, <code>bm_george</code></li>
+          </ul>
+          <p>Para ver todas: <code>npx hyperframes tts --list</code>. En HeyGen: <code>--list</code> en su script; en Gemini se elige por nombre y se describe el tono.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>⏩ Velocidad de la voz</h3></div>
+          <ul>
+            <li><strong>0,7–0,8</strong>: tutoriales, contenido difícil, accesibilidad.</li>
+            <li><strong>1,0</strong>: ritmo natural (por defecto).</li>
+            <li><strong>1,1–1,2</strong>: entradas, transiciones, tono animado.</li>
+            <li><strong>1,5 o más</strong>: rara vez conviene; probarlo con cuidado.</li>
+          </ul>
+          <p>Estos valores numéricos son de Kokoro (<code>--speed</code>). En Gemini la velocidad se pide con palabras en el estilo, no con un número.</p>
+          <p class="ojo">Si el vídeo se pasa de tiempo, mejor recortar texto y pausas que acelerar la voz.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🎼 Música de fondo</h3></div>
+          <p>Una sola pista de música por vídeo. Dos caminos:</p>
+          <ul>
+            <li><strong>Con sesión de HeyGen</strong>: la busca en su biblioteca por ambiente ("épica tranquila", "corporativa alegre").</li>
+            <li><strong>Sin sesión</strong>: la genera con Lyria (servicio de Google, necesita clave) o, si no hay clave, con MusicGen en tu PC (más lento).</li>
+          </ul>
+          <p>Si no le dices el estilo, lo deduce del tema: finanzas → cuerdas suaves y piano (92 pulsaciones por minuto); diseño o agencia → electrónica alegre (115); tecnología → piano brillante con sintetizadores (108).</p>
+          <p>Con Lyria se puede afinar: ritmo (90–110 tranquilo, 110–130 enérgico), brillo, densidad, escala mayor o menor y estilos a evitar. Estos ajustes solo están disponibles llamando directamente a la receta de Lyria; por defecto, el motor solo le pasa una descripción del ambiente.</p>
+          <p class="ojo">Si la música falla, el vídeo se renderiza igual, sin ella.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>💥 Efectos de sonido</h3></div>
+          <p>Nunca se generan: se buscan o se toman de una colección.</p>
+          <ul>
+            <li><strong>Con sesión de HeyGen</strong>: su biblioteca en línea. Hay que nombrarlos en concreto ("cristal rompiéndose"), no en abstracto ("sonido dramático").</li>
+            <li><strong>Sin sesión</strong>: 21 incluidos: whoosh (barrido), pop, clic, campanita, subida de tensión, impactos graves, glitch, tecleo...</li>
+          </ul>
+          <p>Si un efecto no se encuentra, se salta y el vídeo sigue.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🔊 Volumen: valores de partida</h3></div>
+          <ul>
+            <li>Música <strong>debajo de una voz</strong>: 0,12 (unos −18 dB). Es una alfombra, no compite.</li>
+            <li>Música <strong>sin voz</strong>: 0,9.</li>
+            <li>Efectos de sonido: 0,35, siempre por debajo de voz y música.</li>
+          </ul>
+          <p>Son solo el punto de partida: cualquier volumen se puede fijar a mano. Y se puede cambiar a lo largo del vídeo con una curva (subir la música en la entrada y bajarla cuando empieza a hablar la voz).</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🎛️ Mezcla: que voz y música no se peleen</h3></div>
+          <p class="analogia">En un pasillo estrecho no hace falta que uno desaparezca: basta con que se eche a un lado cuando pasa el otro.</p>
+          <ul>
+            <li><strong>Fundidos</strong> de entrada y de salida, y <strong>fundido cruzado</strong> entre dos clips.</li>
+            <li><strong>"Voiceover carve"</strong>: la música se aparta sola, solo en las frecuencias de la voz y solo cuando habla. Suena mejor que bajar la música entera.</li>
+            <li><strong>Grupo de pistas</strong>: un solo mando de volumen y unos mismos efectos para varias pistas a la vez.</li>
+            <li><strong>Velocidad del clip</strong> de 0,1× a 10×, sin que la voz se vuelva de pito, y aceleraciones progresivas.</li>
+          </ul>
+          <p>Lo que oyes en la vista previa es exactamente lo que sale en el render.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🎤 Arreglar la voz o darle carácter</h3></div>
+          <p>Ajustes de un clic sobre una voz grabada:</p>
+          <ul>
+            <li><strong>Mejorar</strong>: <code>voice-clean</code> (de aficionado a limpia), <code>voice-broadcast</code> (sonido de radio), <code>voice-warm</code> (cercana, íntima).</li>
+            <li><strong>Reparar</strong>: <code>rumble-cut</code> (zumbido o golpes graves), <code>room-gate</code> (silencia la sala entre frases), <code>boom-tame</code> (micro demasiado cerca), <code>harsh-tame</code> (voz chillona que cansa).</li>
+            <li><strong>Disfraces</strong>: teléfono, radio antigua, megáfono, cinta lo-fi, megafonía, interfono.</li>
+            <li><strong>Espacio</strong>: sala pequeña, sala natural, gran salón, eco corto, ecos largos.</li>
+          </ul>
+          <p>Por debajo hay ecualizador, compresor, limitador, puerta de ruido, saturación, delay, reverb, chorus, phaser y bitcrush.</p>
+          <p class="ojo">No hay arreglo incluido para las "eses" que silban. <code>room-gate</code> calla las pausas, pero no quita el ruido que suena debajo de la voz.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>💬 Subtítulos sincronizados</h3></div>
+          <p>Para que cada palabra aparezca justo cuando se dice hace falta el segundo exacto de cada palabra. Sale de dos sitios:</p>
+          <ul>
+            <li>Directamente de la voz, si la genera HeyGen (o edge-tts).</li>
+            <li>Transcribiendo el audio: <code>npx hyperframes transcribe</code>.</li>
+          </ul>
+          <p>Para un vídeo grabado, <code>embedded-captions</code> ofrece 35 estilos visuales.</p>
+        </article>
+
+      </div>
+    </section>
+
+
+    <!-- ============ CONTARLO ============ -->
+    <section class="category contar" id="contar">
+      <h2>📣 Contarlo en 30 segundos</h2>
+      <div class="trucos-grid">
+
+        <article class="truco ancho">
+          <div class="truco-head"><h3>Texto listo para copiar y compartir</h3></div>
+          <div class="code-wrap"><pre>HyperFrames convierte una página web en vídeo, y sus skills funcionan como una productora.
+
+1. Recepción: la skill "hyperframes". Le dices qué vídeo quieres, te hace unas preguntas y elige el equipo. Siempre se empieza por ella.
+
+2. Diez equipos, uno por tipo de vídeo. Cambian según lo que les das: una web para una promo, un texto para un vídeo explicativo, una grabación para subtítulos o rótulos, una canción para un vídeo al ritmo, una idea corta para una animación, un tema para una presentación, una pull request para explicar código, un proyecto de Remotion para pasarlo a HyperFrames... y uno a medida para todo lo demás.
+
+3. Diez técnicos que el equipo llama cuando los necesita: reglas del archivo, animación, cámara, dirección de arte, mezcla de sonido, recursos (voz, música, imágenes), catálogo de 400 efectos hechos, consola, editor Studio y Figma.
+
+La voz puede ser de HeyGen, ElevenLabs, Gemini o Kokoro (gratis y sin internet), con velocidad e idioma a elegir. La música se busca o se genera según el ambiente, y la mezcla aparta la música automáticamente cuando habla la voz.
+
+No hace falta saber cuál usar: escribe /hyperframes y cuenta qué quieres.</pre></div>
+        </article>
+
+      </div>
+    </section>
+
+    <p class="sin-resultados" id="sin-resultados">No hay nada que coincida con la búsqueda.</p>
+
+    <section class="pie">
+      <h2>🔧 Mantenimiento de esta página</h2>
+      <p>Está en <code>_archivos_por_categoria/web/html/hyperframes.html</code> y se mantiene a mano. Se escribió el 08/10/2026 leyendo los <code>SKILL.md</code> instalados en <code>~/.agents/skills</code>.</p>
+      <p>Las skills de HyperFrames se actualizan solas con <code>npx hyperframes skills update</code>; si cambian nombres, valores por defecto o proveedores, hay que revisar esta página. La portada las agrupa en una sola tarjeta; la lista del grupo sale del registro de instalación (<code>~/.agents/.skill-lock.json</code>, skills con origen <code>heygen-com/hyperframes</code>) y el generador las agrupa solo.</p>
+    </section>
+  </div>
+
+  <script>
+    // Boton "Copiar" en cada bloque de codigo (copiado de trucos.html).
+    document.querySelectorAll('.code-wrap').forEach(function (wrap) {
+      var pre = wrap.querySelector('pre');
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'copy-btn';
+      btn.textContent = 'Copiar';
+      btn.addEventListener('click', function () {
+        var texto = pre.textContent;
+        var hecho = function () {
+          btn.textContent = 'Copiado';
+          setTimeout(function () { btn.textContent = 'Copiar'; }, 1500);
+        };
+        var aMano = function () {
+          var area = document.createElement('textarea');
+          area.value = texto;
+          area.style.position = 'fixed';
+          area.style.opacity = '0';
+          document.body.appendChild(area);
+          area.select();
+          try { document.execCommand('copy'); hecho(); } catch (e) { btn.textContent = 'Error'; }
+          document.body.removeChild(area);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(texto).then(hecho, aMano);
+        } else {
+          aMano();
+        }
+      });
+      wrap.appendChild(btn);
+    });
+
+    // Buscador: filtra tarjetas por su texto y oculta las secciones vacias.
+    (function () {
+      var input = document.getElementById('buscar');
+      var contador = document.getElementById('contador');
+      var vacio = document.getElementById('sin-resultados');
+      var tarjetas = Array.prototype.slice.call(document.querySelectorAll('.truco'));
+      var categorias = Array.prototype.slice.call(document.querySelectorAll('.category'));
+      var normalizar = function (s) {
+        return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+      };
+      tarjetas.forEach(function (t) { t.dataset.texto = normalizar(t.textContent); });
+
+      function filtrar() {
+        var q = normalizar(input.value.trim());
+        var visibles = 0;
+        tarjetas.forEach(function (t) {
+          var ok = !q || t.dataset.texto.indexOf(q) !== -1;
+          t.style.display = ok ? '' : 'none';
+          if (ok) visibles++;
+        });
+        categorias.forEach(function (c) {
+          var alguna = Array.prototype.some.call(c.querySelectorAll('.truco'), function (t) { return t.style.display !== 'none'; });
+          c.style.display = alguna ? '' : 'none';
+        });
+        contador.textContent = q
+          ? visibles + ' de ' + tarjetas.length + ' fichas'
+          : tarjetas.length + ' fichas';
+        vacio.style.display = visibles ? 'none' : 'block';
+      }
+
+      input.addEventListener('input', filtrar);
+      filtrar();
+    })();
+  </script>
+</body>
+</html>

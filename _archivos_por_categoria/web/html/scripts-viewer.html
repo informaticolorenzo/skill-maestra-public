@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visor de scripts - Skill Maestra</title>
+  <style>
+    [hidden] { display: none !important; }
+    :root { --bg:#f5f7fb; --card:#fff; --ink:#172033; --muted:#64748b; --line:#e2e8f0; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background:var(--bg); color:var(--ink); }
+    .topbar { display:flex; align-items:center; gap:12px; padding:14px 16px; background:rgba(255,255,255,.95); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10; }
+    .btn { border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:10px; padding:8px 12px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+    .btn:hover { background:#f8fafc; }
+    .path { color:var(--muted); font-size:.9rem; overflow-wrap:anywhere; }
+    .wrap { max-width: 1400px; margin: 18px auto 32px; padding: 0 16px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; box-shadow:0 8px 24px rgba(15,52,96,.06); }
+    .toolbar { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+    .btn { border:1px solid var(--line); background:#fff; color:var(--ink); border-radius:10px; padding:8px 12px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+    .btn.primary { background:#0f3460; color:#fff; border-color:#0f3460; }
+    .btn:disabled { opacity:.6; cursor:wait; }
+    pre { margin:0; white-space:pre-wrap; word-break:break-word; background:#0f172a; color:#e2e8f0; padding:16px; border-radius:12px; overflow:auto; font-size:.9rem; line-height:1.5; }
+    .error { color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; padding:12px; border-radius:12px; margin-bottom:12px; }
+    .result { margin-top:14px; border:1px solid var(--line); border-radius:12px; padding:12px; background:#f8fafc; }
+    .result.ok { border-color:#86efac; background:#f0fdf4; }
+    .result.fail { border-color:#fda4af; background:#fff1f2; }
+    .result pre { margin-top:8px; max-height:320px; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a class="btn" href="./index.html">← Volver al indice</a>
+    <div class="path" id="filePath">Cargando...</div>
+  </div>
+  <div class="wrap">
+    <div class="card">
+      <div class="toolbar">
+        <button class="btn" onclick="window.location.href='./index.html'">← Volver al indice</button>
+      </div>
+      <div id="content">Cargando contenido...</div>
+      <div id="runResult"></div>
+    </div>
+  </div>
+  <script>
+    function normalizePath(value) {
+      return String(value || '').replace(/\\/g, '/').replace(/^\/+/, '');
+    }
+
+    async function start() {
+      const params = new URLSearchParams(window.location.search);
+      const file = params.get('file');
+      const content = document.getElementById('content');
+      const filePath = document.getElementById('filePath');
+
+      if (!file) {
+        content.innerHTML = '<div class="error">Falta el parámetro file en la URL.</div>';
+        return;
+      }
+
+      const normalized = normalizePath(file);
+      filePath.textContent = normalized;
+
+      try {
+        const res = await fetch('/' + normalized, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const text = await res.text();
+        content.innerHTML = '<pre>' + escapeHtml(text) + '</pre>';
+      } catch (err) {
+        content.innerHTML = '<div class="error">No se pudo cargar el archivo: ' + escapeHtml(err.message) + '</div>';
+      }
+
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+
+    start();
+  </script>
+</body>
+</html>

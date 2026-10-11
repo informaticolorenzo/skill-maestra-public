@@ -1,0 +1,32 @@
+{
+  "name": "skill-maestra-viewer",
+  "displayName": "Skill Maestra Viewer",
+  "description": "Abre la web local de Skill Maestra en Live Preview o navegador interno de VS Code.",
+  "version": "0.0.4",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
+  "activationEvents": [
+    "workspaceContains:_archivos_por_categoria/web/html/index.html",
+    "onCommand:skillMaestraViewer.open"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "skillMaestraViewer.open",
+        "title": "Abrir Skill Maestra Web",
+        "category": "Skill Maestra"
+      }
+    ]
+  }
+}

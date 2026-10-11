@@ -1,0 +1,35 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Abrir Skill Maestra Web al iniciar",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				".\\open-skill-maestra-web.ps1"
+			],
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"problemMatcher": [],
+			"group": "build"
+		},
+		{
+			"label": "Arrancar servidor Skill Maestra (localhost:8000)",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-ExecutionPolicy",
+				"Bypass",
+				"-File",
+				".\\open-skill-maestra-web.ps1",
+				"-ServerOnly"
+			],
+			"isBackground": false,
+			"group": "build"
+		}
+	]
+}

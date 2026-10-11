@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comandos — Skill Maestra</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 10% 0%, #e8f0ff 0%, #f5f7fb 40%);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: #1f2937;
+      padding: 20px;
+    }
+
+    .container { max-width: 1280px; margin: 0 auto; }
+
+    .header { text-align: center; margin-bottom: 30px; }
+    h1 { font-size: 2.3rem; margin: 0 0 10px 0; color: #0f3460; }
+    .subtitle { font-size: 1.05rem; color: #6b7280; margin: 0; }
+
+    .back-btn {
+      display: inline-block; margin-bottom: 20px; padding: 10px 16px;
+      background: white; border: 1px solid #cbd5e1; border-radius: 8px;
+      text-decoration: none; color: #1f2937; cursor: pointer;
+      font-size: 0.9rem; transition: all 0.2s;
+    }
+    .back-btn:hover { border-color: #0f3460; background: #f0f9ff; }
+
+    .agent-block {
+      border-radius: 18px;
+      padding: 26px;
+      margin-bottom: 36px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .agent-block.claude { background: linear-gradient(135deg, #fff4ee 0%, #ffffff 55%); border: 1px solid #f3c8ae; }
+    .agent-block.codex  { background: linear-gradient(135deg, #f8fafc 0%, #ffffff 55%); border: 1px solid #cbd5e1; }
+
+    .agent-head { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+    .agent-logo { font-size: 2rem; width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; }
+    .agent-block.claude .agent-logo { background: #DA7756; }
+    .agent-block.codex .agent-logo { background: #64748b; }
+    .agent-head h2 { margin: 0; font-size: 1.55rem; }
+    .agent-block.claude .agent-head h2 { color: #b54708; }
+    .agent-block.codex .agent-head h2 { color: #475569; }
+    .agent-meta { color: #6b7280; font-size: 0.88rem; margin: 4px 0 18px; line-height: 1.5; }
+    .agent-meta code { background: #eef2f9; border-radius: 6px; padding: 2px 6px; font-family: Consolas, monospace; }
+
+    .search-wrap { position: relative; margin-bottom: 20px; }
+    .search-input {
+      width: 100%; padding: 12px 16px 12px 42px; border-radius: 12px;
+      border: 1.5px solid #d7e1ef; font-size: 0.95rem; background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .agent-block.claude .search-input:focus { border-color: #c2410c; box-shadow: 0 0 0 3px rgba(194,65,12,0.12); outline: none; }
+    .agent-block.codex .search-input:focus { border-color: #64748b; box-shadow: 0 0 0 3px rgba(100,116,139,0.15); outline: none; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: .45; pointer-events: none; }
+    .search-count { font-size: 0.78rem; color: #6b7280; margin: -10px 0 18px 2px; }
+
+    .cmd-category { margin-bottom: 22px; }
+    .cmd-category:last-child { margin-bottom: 0; }
+    .cmd-category h3 {
+      font-size: 0.95rem; font-weight: 700; margin: 0 0 12px 0;
+      padding: 6px 14px; border-radius: 999px; display: inline-block;
+    }
+    .agent-block.claude .cmd-category h3 { background: #ffe4d6; color: #9a3412; }
+    .agent-block.codex .cmd-category h3 { background: #e2e8f0; color: #334155; }
+
+    .cmd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+
+    .cmd-card {
+      background: white; border: 1px solid #e5e7eb; border-radius: 10px;
+      padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      transition: all .2s ease; cursor: pointer; position: relative;
+    }
+    .cmd-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+    .agent-block.claude .cmd-card:hover { border-color: #c2410c; }
+    .agent-block.codex .cmd-card:hover { border-color: #64748b; }
+    .cmd-card::after {
+      content: "ⓘ"; position: absolute; top: 12px; right: 12px;
+      font-size: 0.85rem; color: #cbd5e1; transition: color .2s;
+    }
+    .cmd-card:hover::after { color: #94a3b8; }
+
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55);
+      z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+      backdrop-filter: blur(2px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: white; border-radius: 16px; max-width: 560px; width: 100%;
+      max-height: 80vh; overflow-y: auto; padding: 28px 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3); position: relative;
+      animation: modalIn .15s ease-out;
+    }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px; width: 32px; height: 32px;
+      border-radius: 8px; border: none; background: #f1f5f9; color: #64748b;
+      font-size: 1.1rem; cursor: pointer; line-height: 1;
+    }
+    .modal-close:hover { background: #e2e8f0; color: #1f2937; }
+    .modal-badge {
+      display: inline-block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .04em; padding: 3px 10px; border-radius: 999px; margin-bottom: 10px;
+    }
+    .modal-badge.claude { background: #ffe4d6; color: #9a3412; }
+    .modal-badge.codex { background: #e2e8f0; color: #334155; }
+    .modal-cat { font-size: 0.78rem; color: #94a3b8; margin: 0 0 14px 0; }
+    .modal-name {
+      font-family: Consolas, "Courier New", monospace; font-weight: 700;
+      font-size: 1.3rem; margin: 0 0 4px 0; color: #0f172a;
+    }
+    .modal-desc { color: #374151; font-size: 0.95rem; line-height: 1.65; white-space: pre-line; }
+
+    .cmd-name {
+      font-family: Consolas, "Courier New", monospace; font-weight: 700;
+      font-size: 0.92rem; margin: 0 0 6px 0;
+    }
+    .cmd-icon { font-family: initial; margin-right: 6px; }
+    .agent-block.claude .cmd-name { color: #b54708; }
+    .agent-block.codex .cmd-name { color: #475569; }
+    .cmd-desc { color: #4b5563; font-size: 0.85rem; line-height: 1.5; margin: 0; }
+
+    .no-results { color: #94a3b8; font-size: 0.9rem; padding: 14px 4px; }
+
+    footer { text-align: center; padding: 26px; color: #aaa; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="./index.html" class="back-btn">← Volver al índice</a>
+
+    <div class="header">
+      <h1>🗂️ Comandos disponibles</h1>
+      <p class="subtitle">Referencia buscable — Claude Code y Codex, cada uno con su propio buscador</p>
+    </div>
+
+    <!-- CLAUDE -->
+    <section class="agent-block claude">
+      <div class="agent-head">
+        <div class="agent-logo">◆</div>
+        <h2>Claude Code</h2>
+      </div>
+      <p class="agent-meta">Comandos nativos del programa + skills del entorno (globales en <code>~/.agents/skills</code> y del repo en <code>.github/skills</code>), invocables escribiendo <code>/nombre-skill</code>.</p>
+      <div class="search-wrap">
+        <span class="search-icon">🔎</span>
+        <input type="text" class="search-input" id="search-claude" placeholder="Buscar comando o skill de Claude (ej: memoria, dataverse, revisión...)">
+      </div>
+      <div class="search-count" id="count-claude"></div>
+      <div id="grid-claude"></div>
+    </section>
+
+    <!-- CODEX -->
+    <section class="agent-block codex">
+      <div class="agent-head">
+        <div class="agent-logo">✦</div>
+        <h2>Codex</h2>
+      </div>
+      <p class="agent-meta">Incluye los comandos <code>/codex:*</code> que se usan desde dentro de Claude Code (plugin oficial <code>openai-codex</code> v1.0.6) y los comandos nativos del propio Codex CLI / app cuando se trabaja directamente en su terminal.</p>
+      <div class="search-wrap">
+        <span class="search-icon">🔎</span>
+        <input type="text" class="search-input" id="search-codex" placeholder="Buscar comando de Codex (ej: rescue, sandbox, review...)">
+      </div>
+      <div class="search-count" id="count-codex"></div>
+      <div id="grid-codex"></div>
+    </section>
+
+  </div>
+
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button type="button" class="modal-close" id="modal-close" aria-label="Cerrar">✕</button>
+      <span class="modal-badge" id="modal-badge"></span>
+      <p class="modal-cat" id="modal-cat"></p>
+      <p class="modal-name" id="modal-name"></p>
+      <p class="modal-desc" id="modal-desc"></p>
+    </div>
+  </div>
+
+  <footer>Skill Maestra · Comandos de Claude Code y Codex</footer>
+
+<script>
+const claudeData = [
+  { cat: "Sesión y gestión de proyecto", icon: "🗂️", items: [
+    ["/init", "Inicializar proyecto con guía CLAUDE.md", "Analiza el repositorio y genera un CLAUDE.md inicial con arquitectura, comandos de build/test y convenciones detectadas. Es el punto de partida recomendado en cualquier proyecto nuevo para que Claude tenga contexto sin tener que repetirlo cada vez."],
+    ["/memory", "Editar archivos CLAUDE.md y gestionar memoria automática", "Abre los CLAUDE.md (de usuario, proyecto o carpeta) para editarlos directamente, y es el punto de entrada a la memoria automática entre conversaciones: reglas, contexto de proyecto y preferencias que se recuerdan sin repetirlas."],
+    ["/clear", "Iniciar conversación nueva vaciando contexto", "Vacía completamente el contexto y empieza desde cero, sin conservar nada de lo anterior. Útil cuando cambias de tarea por completo y no quieres que lo previo contamine las respuestas."],
+    ["/cd", "Mover sesión a directorio diferente", "Cambia el directorio de trabajo de la sesión sin cerrarla. Desde la v2.1.246 los ajustes, hooks, servidores MCP y skills del nuevo proyecto se aplican de inmediato, no solo al reanudar."],
+    ["/add-dir", "Añadir directorio de trabajo para acceso a archivos", "Da acceso a una carpeta adicional fuera del directorio de trabajo principal, sin tener que moverte a ella con /cd."],
+    ["/resume", "Reanudar conversación anterior", "Abre un selector de sesiones anteriores agrupadas por día, con carpeta, rama de git y vista previa de en qué quedaste. Funciona también entre terminal y app de escritorio: puedes empezar en una y seguir en otra."],
+    ["/rewind", "Volver a checkpoint anterior antes de cambios", "Deshace código y/o mensajes hasta un checkpoint anterior (se activa también con doble Esc y prompt vacío). Guarda snapshots de los últimos 100 checkpoints, pero no rastrea cambios hechos por comandos Bash (rm, mv, cp) ni ediciones de subagentes normales."],
+    ["/recap", "Resumir conversación para gestión de contexto", "Genera un resumen pensado para gestión de contexto, útil antes de compactar o al retomar una sesión larga."],
+    ["/sessions", "Abrir selector de sesiones para reanudar", "Lista y abre el selector de sesiones guardadas para reanudar cualquiera de ellas."],
+    ["/continue", "Continuar sesión previa", "Continúa la sesión más reciente directamente, sin pasar por el selector."],
+  ]},
+  { cat: "Modelo y rendimiento", icon: "🧠", items: [
+    ["/model", "Cambiar modelo de IA", "Cambia el modelo que responde en esta sesión. Útil para bajar a un modelo más barato en tareas simples, o subir a Opus para problemas complejos. Atajo: Option+P (macOS) / Alt+P (Win/Linux) lo cambia sin borrar el prompt actual."],
+    ["/effort", "Establecer nivel de esfuerzo (low a xhigh, max, ultracode, auto)", "Ajusta cuánto 'piensa' el modelo antes de responder. Niveles: low, medium, high (default en la mayoría), xhigh (default en Opus 4.7), max, y ultracode (esfuerzo xhigh + orquestación dinámica de workflows, requiere v2.1.203+)."],
+    ["/fast", "Alternar modo rápido", "Activa una respuesta más rápida con Opus, sin cambiar de modelo. Atajo: Option+O (macOS) / Alt+O (Win/Linux)."],
+    ["/advisor", "Habilitar/deshabilitar asesor para orientación", "Activa un asesor adicional que da orientación sobre cómo abordar la tarea."],
+  ]},
+  { cat: "Contexto y visualización", icon: "📊", items: [
+    ["/context", "Visualizar uso de contexto en forma de rejilla", "Pinta visualmente cuánto del contexto disponible se está usando y en qué (sistema, herramientas, conversación) — útil para saber si conviene compactar pronto."],
+    ["/compact", "Liberar contexto resumiendo conversación", "Resume la conversación para liberar espacio de contexto sin perder el hilo, en vez de tener que hacer /clear y perderlo todo. Dispara los hooks PreCompact y PostCompact si están configurados."],
+    ["/usage", "Ver desglose de uso de tokens (alias: /cost)", "Desglose de consumo de tokens por sesión, incluyendo cuánto gasta cada tarea /loop programada."],
+    ["/status", "Mostrar estado de la sesión", "Muestra el estado actual: modelo, directorio, cuenta, modo de permisos activo, etc."],
+  ]},
+  { cat: "Revisión de código y calidad", icon: "🔍", items: [
+    ["/code-review", "Revisar diff para bugs y limpiezas (alias: /review)", "Revisa el diff actual (o un PR/rama/ruta indicada) buscando bugs de corrección y oportunidades de limpieza, con nivel de esfuerzo ajustable. Admite --comment para postear en el PR y --fix para aplicar los hallazgos directamente."],
+    ["/security-review", "Revisar diff para vulnerabilidades de seguridad", "Igual que /code-review pero centrado específicamente en vulnerabilidades (inyección, XSS, secretos expuestos, OWASP top 10)."],
+    ["/simplify", "Mejorar calidad de código (reuso, simplificación, eficiencia)", "Revisa el código cambiado buscando solo mejoras de calidad y las aplica — no busca bugs, para eso está /code-review."],
+  ]},
+  { cat: "Trabajo en paralelo", icon: "🧵", items: [
+    ["/batch", "Orquestar cambios a gran escala en el repositorio", "Orquesta un cambio repetitivo a gran escala en muchos archivos a la vez."],
+    ["/background", "Desasociar sesión para ejecutar como agente (alias: /bg)", "Desengancha la sesión actual para que siga trabajando como agente en segundo plano mientras haces otra cosa. Equivale al flag --bg al arrancar."],
+    ["/fork", "Copiar conversación a nueva sesión de fondo", "Duplica la conversación actual en una sesión nueva de fondo, para explorar una vía distinta sin perder la original."],
+    ["/branch", "Crear rama de conversación para explorar dirección alternativa", "Crea una rama de la conversación para probar un enfoque alternativo, conservando la rama original intacta."],
+    ["/subtask", "Asignar tarea secundaria a subagente", "Delega trabajo a un subagente tipo 'fork' (desde v2.1.212) que hereda toda la conversación completa, no solo un prompt de delegación — comparte modelo, system prompt y prompt cache con la sesión principal."],
+    ["/tasks", "Listar trabajo en segundo plano y subagentes", "Lista todo el trabajo en segundo plano y subagentes activos o recientes de esta sesión."],
+  ]},
+  { cat: "Herramientas y configuración", icon: "🛠️", items: [
+    ["/permissions", "Gestionar reglas de acceso a herramientas (alias: /allowed-tools)", "• Gestiona reglas de allow/ask/deny por herramienta y patrón (ej. Bash(git:*), Read(./secrets/**)) sin pedir confirmación cada vez\n• Incluye una pestaña visual para las reglas del modo automático (allow/soft_deny/hard_deny) sin editar JSON a mano\n• Los cambios se guardan en settings.json (proyecto) o settings.local.json (personal, no versionado) según el scope elegido\n• Alias: /allowed-tools\n• Se combina con los modos de Shift+Tab (default, acceptEdits, plan, bypassPermissions), que determinan qué reglas aplican en cada momento\n• Útil para dar acceso permanente a comandos repetitivos (npm test, git status) sin aprobarlos uno a uno"],
+    ["/mcp", "Gestionar conexiones de servidores MCP", "• Añade, edita y elimina servidores MCP (stdio, SSE o HTTP) desde la propia sesión\n• Revisa el estado de autenticación de cada servidor y relanza el flujo OAuth si hace falta\n• 3 scopes de configuración: local (solo este proyecto, en ~/.claude.json), project (compartido vía .mcp.json versionado en el repo) y user (todos tus proyectos)\n• Muestra qué herramientas expone cada servidor conectado\n• Los servidores project (.mcp.json) piden aprobación explícita la primera vez que se abre el repo, por seguridad\n• Se puede combinar con /doctor para diagnosticar un servidor que no conecta"],
+    ["/hooks", "Ver configuraciones de hooks", "• Muestra los hooks configurados: comandos, prompts o agentes que se disparan automáticamente en eventos del ciclo de vida de la sesión\n• Cubre eventos como PreToolUse, PostToolUse, PreCompact, PostCompact o Stop (ver categoría 'Hooks' más abajo para la lista completa)\n• Permite ver rápidamente qué automatización está activa sin abrir settings.json a mano\n• Los hooks viven en settings.json/settings.local.json y se pueden scopear a usuario o proyecto\n• Útil para depurar por qué una acción se bloquea o se dispara un efecto inesperado al usar una herramienta"],
+    ["/plugin", "Gestionar plugins", "• Instala, actualiza o desinstala plugins de Claude Code desde un marketplace o repositorio\n• Ejemplo real en este repo: el plugin de Codex (openai-codex), que añade los comandos /codex:*\n• Un plugin puede aportar comandos slash, agentes, hooks y skills empaquetados juntos\n• Permite ver qué plugins están activos y su origen (local, git, marketplace)\n• Relacionado con /mcp: algunos plugins registran también servidores MCP como parte de su instalación"],
+    ["/config", "Abrir interfaz de configuración (alias: /settings)", "• Abre la interfaz de configuración general de la herramienta (no de un proyecto concreto)\n• Alias: /settings\n• Incluye tema de color, modelo por defecto, modo de editor (incluido modo vim) y notificaciones\n• Desde aquí se puede desactivar el redactado automático de /feedback\n• Complementa a /theme, que solo cambia el color, y a /permissions, que cubre las reglas de acceso a herramientas"],
+    ["/git", "Ejecutar comandos git", "• Ejecuta comandos git guiados desde dentro de la sesión, sin salir a otra terminal\n• Sigue el protocolo de seguridad integrado: nunca hace force-push, reset --hard o salta hooks (--no-verify) salvo petición explícita del usuario\n• Prefiere crear commits nuevos en vez de usar --amend, salvo que se pida explícitamente\n• Para gestionar pull requests o issues de GitHub se usa gh (GitHub CLI) en vez de este comando"],
+  ]},
+  { cat: "Utilidad y ayuda", icon: "❓", items: [
+    ["/help", "Mostrar ayuda y comandos disponibles", "Lista todos los comandos disponibles con una breve descripción de cada uno."],
+    ["/feedback", "Enviar retroalimentación sobre el producto", "Envía retroalimentación a Anthropic. Si algo falló durante la sesión, Claude redacta el informe con los detalles por ti (herramienta SendFeedback, v2.1.247) — los borradores se guardan localmente y no se envían hasta que los apruebas explícitamente. Desactivable en /config."],
+    ["/bug", "Reportar bug (alias: /share)", "Reporta un bug concreto, adjuntando contexto de la sesión."],
+    ["/btw", "Hacer pregunta secundaria sin añadir a historial", "Hace una pregunta lateral sobre la sesión sin que cuente como parte del historial principal de la conversación — funciona incluso mientras Claude está trabajando."],
+    ["/export", "Exportar conversación como texto plano", "Exporta toda la conversación como texto plano, por ejemplo para pegarla en un documento."],
+    ["/copy", "Copiar última respuesta al portapapeles", "Copia la última respuesta de Claude al portapapeles."],
+    ["/theme", "Establecer color de barra de solicitud", "Cambia el esquema de color de toda la interfaz (claro/oscuro/etc.) — no confundir con /color, que solo pinta la barra de una sesión concreta para distinguirla de otras."],
+  ]},
+  { cat: "Herramientas de IA (skills integrados de fábrica)", icon: "✨", items: [
+    ["/debug", "Habilitar logging de debug", "Activa logging detallado, útil para diagnosticar un problema de la propia herramienta Claude Code."],
+    ["/doctor", "Ejecutar checkup de configuración (alias: /checkup)", "Ejecuta una comprobación de salud de la configuración (permisos, hooks, MCP, etc.) sin arrancar una sesión completa, y avisa de problemas."],
+    ["/deep-research", "Búsquedas en abanico y sintetizar informe", "Lanza búsquedas en abanico sobre un tema y sintetiza un informe final a partir de los resultados."],
+    ["/dataviz", "Orientación para gráficos y dashboards", "Guía de diseño a seguir antes de crear cualquier gráfico, dashboard o visualización de datos, para que el resultado sea coherente, accesible y legible en claro/oscuro."],
+    ["/design", "Crear artboards UI editables", "Crea un lienzo de diseño multi-artboard (mockups, pantallas, posters) publicado como Artifact editable visualmente por el usuario."],
+    ["/design-sync", "Sincronizar sistema de diseño React a Claude Design", "Sincroniza un sistema de diseño React existente con Claude Design."],
+  ]},
+  { cat: "Sesiones en nube y remotas", icon: "☁️", items: [
+    ["/cloud", "Iniciar sesión en la nube", "Inicia una sesión que corre en la nube de Anthropic en vez de en tu máquina local."],
+    ["/teleport", "Mover sesión de web a terminal", "Retoma en tu terminal local una sesión que estaba corriendo en la web (equivale al flag --teleport)."],
+    ["/remote-control", "Iniciar sesión de Control Remoto", "Activa Remote Control: permite iniciar y controlar sesiones en esta máquina desde el móvil (app iOS/Android) o claude.ai/code, apareciendo como tarjeta de dispositivo — el código sigue ejecutándose en tu máquina, el móvil es solo el mando. Equivale a --rc al arrancar."],
+    ["/terminal-setup", "Configurar ajustes específicos de terminal", "Configura ajustes específicos del emulador de terminal que se está usando (ej. soporte de Shift+Enter)."],
+    ["/schedule", "Crear tareas en la nube con cronograma", "Crea una tarea programada en la nube (cron) que ejecuta Claude Code periódicamente sin intervención."],
+    ["/web-setup", "Configurar Claude Code en la web", "Configura el acceso a Claude Code desde el navegador (claude.ai/code)."],
+  ]},
+  { cat: "Cuenta", icon: "👤", items: [
+    ["/login", "Iniciar sesión en cuenta Anthropic", "Inicia sesión con tu cuenta de Anthropic o API key."],
+    ["/logout", "Cerrar sesión", "Cierra la sesión actual."],
+  ]},
+  { cat: "Atajos de teclado", icon: "⌨️", items: [
+    ["Shift+Tab", "Cicla los modos de permiso de la sesión", "Alterna entre default (manual, solo lectura), acceptEdits (auto-aprueba ediciones y comandos comunes de filesystem), plan (solo lee y planifica, bloquea ediciones hasta aprobar un plan), y según configuración auto o bypassPermissions. En Windows, si el terminal no soporta VT input, el atajo equivalente es Alt+M."],
+    ["Esc / Esc Esc", "Interrumpir, limpiar o abrir rewind", "Esc interrumpe la respuesta en curso o cierra un diálogo de permisos (equivale a 'No'). Doble Esc con texto en el prompt lo limpia y guarda en el historial; con el prompt vacío, abre el menú de checkpoints (rewind) para restaurar código y/o conversación."],
+    ["Ctrl+C / Ctrl+D", "Interrumpir o salir de la sesión", "Ctrl+C interrumpe una operación en curso (1ª pulsación limpia el input, 2ª sale). Ctrl+D sale de la sesión (1ª pulsación confirma, 2ª en menos de 800ms sale de verdad); con texto en el prompt, borra el carácter siguiente al cursor."],
+    ["Ctrl+X Ctrl+K", "Detener subagentes en segundo plano", "Detiene todos los subagentes en background de la sesión y desactiva las auto-respuestas a comentarios de Artifacts. Hay que pulsarlo dos veces en 3 segundos para confirmar."],
+    ["Ctrl+G / Ctrl+X Ctrl+E", "Abrir el prompt en tu editor externo", "Abre el texto del prompt actual en tu editor de texto por defecto ($VISUAL o $EDITOR) para componer mensajes largos con comodidad; al guardar y cerrar, el texto vuelve al composer."],
+    ["Ctrl+L", "Redibujar la pantalla", "Redibuja la pantalla completa de la terminal — útil si se corrompe visualmente tras un resize o un output raro."],
+    ["Ctrl+O", "Alternar el visor de transcripción", "Muestra u oculta el detalle de uso de herramientas, timestamp y modelo por mensaje. Dentro del selector /model, también expande/colapsa bloques de razonamiento (thinking) en VS Code."],
+    ["Ctrl+R", "Búsqueda inversa en el historial", "Búsqueda inversa interactiva sobre el historial de comandos/prompts, como en una shell Bash."],
+    ["Ctrl+V / Cmd+V / Alt+V", "Pegar imagen del portapapeles", "Cmd+V en iTerm2, Alt+V en Windows/WSL — inserta la imagen del portapapeles como chip [Image #N] en el prompt. En Remote Control, también puedes adjuntar fotos desde el móvil y Claude las ve directamente."],
+    ["Ctrl+B", "Enviar comando Bash a segundo plano", "Mueve un comando Bash en ejecución a segundo plano sin interrumpirlo (en tmux, hay que pulsarlo dos veces)."],
+    ["Ctrl+T", "Mostrar/ocultar checklist de tareas", "Muestra u oculta la lista de tareas (to-do list) que Claude va llevando internamente durante trabajo largo."],
+    ["Ctrl+S", "Guardar/restaurar el prompt actual", "Guarda el texto del prompt actual como un 'stash' y lo restaura después, útil si quieres escribir otra cosa sin perder un borrador largo."],
+    ["Ctrl+Z", "Suspender Claude Code al shell", "En sistemas Unix, suspende la sesión al shell; se retoma con el comando fg."],
+    ["Ctrl+P / Ctrl+N", "Navegar historial o mover cursor", "Junto con las flechas arriba/abajo, mueve el cursor por líneas o navega el historial de prompts enviados."],
+    ["Ctrl+A / Ctrl+E", "Ir a inicio/fin de línea", "Atajos de edición estilo readline dentro del prompt."],
+    ["Ctrl+K / Ctrl+U / Ctrl+Y", "Cortar y pegar texto del prompt", "Ctrl+K borra hasta el final de la línea, Ctrl+U hasta el inicio, Ctrl+Y pega lo último borrado (kill-ring estilo readline)."],
+    ["Ctrl+W / Alt+B / Alt+F / Alt+D", "Editar por palabras", "Ctrl+W borra la palabra anterior, Alt+B/Alt+F mueven el cursor por palabras, Alt+D borra la palabra siguiente. Con keybindingFlavor: 'readline' en settings.json siguen exactamente las convenciones de Bash."],
+    ["Option+P / Alt+P", "Cambiar de modelo sin perder el prompt", "macOS: Option+P, Windows/Linux: Alt+P — abre el cambio de modelo sin borrar lo que ya habías escrito."],
+    ["Option+T / Alt+T", "Alternar extended thinking", "Activa o desactiva el razonamiento extendido para el turno."],
+    ["Option+O / Alt+O", "Alternar fast mode", "Activa o desactiva el modo de respuesta rápida (con Opus)."],
+    ["Backslash + Enter / Shift+Enter / Ctrl+J", "Escribir prompts multi-línea", "Backslash+Enter funciona en cualquier terminal; Shift+Enter es nativo en iTerm2/WezTerm/Ghostty/Kitty/Warp/Terminal.app/Windows Terminal; Ctrl+J funciona siempre como alternativa universal."],
+    ["~/.claude/keybindings.json", "Personalizar todos los atajos", "Archivo para remapear acciones (ej. transcript:toggleShowAll, selection:clear). La clave keybindingFlavor: 'readline' en settings.json hace que Ctrl+W/Alt+F/Alt+D sigan convenciones GNU readline como en Bash."],
+    ["Modo vim", "Edición del prompt estilo vim", "Se activa desde /config → Editor mode. Soporta navegación NORMAL/INSERT/VISUAL completa (h/j/k/l, dd, cc, yy, text objects). vimInsertModeRemaps en settings.json permite mapear una secuencia de 2 teclas en INSERT a Escape (ej. 'jj')."],
+  ]},
+  { cat: "Trucos de escritura en el prompt", icon: "✍️", items: [
+    ["! (prefijo)", "Modo shell directo", "Al inicio del prompt ejecuta el comando de shell directamente sin pasar por Claude, añade el output al contexto, y Claude puede responder automáticamente (configurable con respondToBashCommands). En modo shell, escribir una ruta con / muestra autocompletado de archivos/directorios."],
+    ["@ (prefijo)", "Mencionar archivos con autocompletado", "Referencia archivos del proyecto con autocompletado; en sesiones con mensajería entre sesiones, también sugiere otras sesiones activas en la máquina tras el @."],
+    ["# (prefijo)", "Añadir memoria rápida", "Truco ampliamente conocido para añadir una entrada rápida a CLAUDE.md/memoria sin abrir /memory. No confirmado con cita textual en la documentación oficial revisada — verificar antes de darlo por sentado en producción."],
+    [": (prefijo)", "Insertar emoji por shortcode", "Escribir :heart: inserta el emoji ❤️ correspondiente, como en Slack o GitHub."],
+    ["? (prompt vacío)", "Panel de ayuda de atajos", "Con el campo de texto vacío, muestra un panel con los atajos de teclado disponibles."],
+    ["Cola de mensajes", "Encolar texto mientras Claude trabaja", "Escribir y pulsar Enter mientras Claude está trabajando encola el mensaje en vez de interrumpir la tarea en curso; Esc interrumpe y envía la cola inmediatamente."],
+    ["Sugerencia de próximo prompt", "Autocompletado de tu siguiente mensaje", "Claude Code sugiere en gris tu siguiente prompt probable, basado en el historial de la sesión; Tab o → lo acepta."],
+  ]},
+  { cat: "Flags de terminal (claude ...)", icon: "🚩", items: [
+    ["-p / --print", "Modo no interactivo", "Imprime la respuesta y sale, sin sesión interactiva — ideal para scripts y CI. Combinable con --max-turns, --max-budget-usd y --json-schema para forzar una salida validada."],
+    ["--permission-mode", "Modo de permiso al arrancar", "Inicia directamente en un modo: default, acceptEdits, plan, auto, dontAsk, bypassPermissions o manual — sin tener que ciclar con Shift+Tab."],
+    ["--dangerously-skip-permissions", "Saltar todos los prompts de permiso", "Equivale a arrancar en modo bypassPermissions: nada pide confirmación. Solo recomendable en contenedores aislados desechables, nunca contra el repo real de producción."],
+    ["--restricted", "Modo restringido (máquinas compartidas/evals)", "Nuevo en v2.1.248: quita las herramientas que ejecutan comandos, código y WebFetch. Pensado para arneses de evaluación o máquinas compartidas donde no quieres que Claude toque nada del sistema. Equivalente: variable de entorno CLAUDE_CODE_RESTRICTED=1."],
+    ["--continue / -c", "Retomar la conversación más reciente", "Continúa la última conversación del directorio actual sin selector."],
+    ["--resume / -r", "Retomar una sesión concreta", "Retoma por ID/nombre, o abre el selector interactivo si no se especifica cuál."],
+    ["--fork-session", "Bifurcar al reanudar", "Al usar --resume, crea un nuevo ID de sesión en vez de reutilizar el original — deja la sesión previa intacta."],
+    ["--from-pr", "Filtrar sesiones por PR", "Abre el selector de sesiones filtrado solo por las vinculadas a un Pull Request concreto."],
+    ["--model", "Fijar el modelo de la sesión", "Alias cortos (sonnet/opus/haiku/fable) o ID completo del modelo."],
+    ["--effort", "Fijar el nivel de esfuerzo al arrancar", "low, medium, high, xhigh, max o ultracode, sin tener que usar /effort después."],
+    ["--fallback-model", "Modelo(s) de respaldo", "Se usan automáticamente si el modelo principal está saturado."],
+    ["--add-dir", "Directorios de trabajo adicionales", "Da acceso a más carpetas además del directorio de arranque (equivale a /add-dir pero desde el arranque)."],
+    ["--mcp-config", "Cargar servidores MCP puntuales", "Carga servidores MCP desde un archivo o string JSON, para esa sesión."],
+    ["--strict-mcp-config", "Usar solo los MCP indicados", "Ignora cualquier otro servidor MCP configurado globalmente, usando únicamente los pasados por --mcp-config."],
+    ["--settings", "Settings puntuales de sesión", "Ruta o JSON inline de configuración aplicado por encima de los archivos normales, solo para esa sesión."],
+    ["--append-system-prompt", "Añadir al system prompt", "Añade texto al final del system prompt por defecto, sin reemplazarlo (existe también variante --append-system-prompt-file)."],
+    ["--system-prompt", "Reemplazar el system prompt", "Sustituye el system prompt completo por uno propio (variante --system-prompt-file para cargarlo de archivo)."],
+    ["--worktree / -w", "Arrancar en un git worktree aislado", "Crea un worktree bajo .claude/worktrees/<nombre>/ en una rama nueva y arranca ahí la sesión. Soporta --worktree #1234 (con almohadilla) para ramificar directamente desde un PR/MR de GitHub o GitLab."],
+    ["--bg / --background", "Arrancar como agente en segundo plano", "La sesión arranca directamente en background y devuelve el control de la terminal de inmediato."],
+    ["--remote-control / --rc", "Activar Remote Control al arrancar", "Arranca la sesión interactiva con control remoto activo desde el primer momento (equivale a /remote-control)."],
+    ["--name / -n", "Nombrar la sesión al arrancar", "Fija el nombre visible en /resume y en el título de la terminal, sin usar /rename después."],
+    ["--allowedTools / --disallowedTools", "Pre-aprobar o denegar herramientas", "Reglas de permiso pasadas por flag en vez de configurarlas en settings.json — útil para lanzar sesiones puntuales con reglas concretas."],
+    ["--exec", "Job de shell en segundo plano", "Ejecuta un comando de shell como job PTY en background, sin arrancar una sesión completa de Claude."],
+    ["--json-schema", "Forzar salida validada por schema", "Solo en modo -p: obliga a que la respuesta final cumpla un JSON Schema dado."],
+    ["--max-turns / --max-budget-usd", "Límites de turnos y gasto", "Solo en modo -p: corta la ejecución tras N turnos agentic o al superar un tope de gasto en dólares — útil en scripts automatizados sin supervisión."],
+    ["--bare", "Modo mínimo sin personalizaciones", "Omite el auto-descubrimiento de hooks, skills, comandos, subagentes, plugins, MCP y CLAUDE.md — una sesión 'limpia' de fábrica."],
+    ["--safe-mode", "Arrancar sin personalizaciones para depurar", "Desactiva todas las personalizaciones para diagnosticar una configuración rota (settings, hooks o plugin que esté rompiendo la sesión)."],
+    ["--ide", "Conectar automáticamente al IDE", "Se conecta al IDE al arrancar si hay exactamente un IDE compatible detectado."],
+    ["--chrome / --no-chrome", "Integración con Chrome", "Activa o desactiva la integración con Chrome para automatización web."],
+    ["--teleport", "Retomar sesión web en local", "Trae a tu terminal local una sesión que estaba corriendo en la web (equivale a /teleport)."],
+    ["--tmux", "Sesión tmux para el worktree", "Crea una sesión tmux para el worktree — requiere usarse junto a --worktree."],
+    ["claude doctor", "Diagnóstico de instalación", "Comprueba la instalación/configuración sin arrancar una sesión completa (subcomando, no flag)."],
+    ["claude agents", "Vista de sesiones en background", "Panel para monitorizar y lanzar sesiones paralelas en segundo plano."],
+    ["claude mcp login / logout", "Autenticar servidores MCP", "Gestiona el login/logout OAuth de un servidor MCP concreto por nombre."],
+    ["claude setup-token", "Token OAuth de larga duración", "Genera un token pensado para CI, sin depender de una sesión de login interactiva."],
+    ["claude project purge", "Borrar todo el estado local de un proyecto", "Elimina el estado guardado (sesiones, caché) de un proyecto concreto — acción destructiva, usar con cuidado."],
+    ["claude import [codex|gemini]", "Importar configuración de otro agente", "Importa configuración/sesiones desde Codex o Gemini a Claude Code."],
+    ["claude gateway", "Servidor gateway self-hosted", "Levanta un gateway propio auto-alojado para la organización."],
+  ]},
+  { cat: "Configuración avanzada (settings.json)", icon: "⚙️", items: [
+    ["statusLine", "Barra de estado personalizada", "Comando propio para renderizar una barra de estado bajo el prompt (info de proyecto, git, uso de tokens, lo que quieras)."],
+    ["outputStyle", "Cambiar el tono/formato de salida", "Cambia el rol/tono/formato general de las respuestas de Claude ('output style')."],
+    ["env", "Variables de entorno por sesión", "Bloque de variables de entorno aplicadas a cada sesión y a sus subprocesos."],
+    ["promptCacheTtl", "Cache de prompt de 1 hora", "Nuevo en v2.1.243+: para usuarios con API key, alarga el prompt cache de la conversación principal de los 5 minutos por defecto a 1 hora — las sesiones largas con pausas no vuelven a empezar en frío."],
+    ["subagentPromptCacheTtl", "Cache de prompt para subagentes", "Igual que promptCacheTtl pero aplicado a subagentes y peticiones fuera de la conversación principal."],
+    ["hooks", "Definir hooks del ciclo de vida", "Bloque de configuración de hooks (ver categoría 'Hooks' para la lista completa de eventos disponibles)."],
+    ["permissions.allow/deny/ask", "Reglas de permiso por herramienta", "Listas de reglas que deciden si una herramienta se ejecuta sola, se pregunta, o se bloquea. permissions.defaultMode fija el modo de arranque de toda la sesión."],
+    ["keybindingFlavor", "Atajos estilo Bash/readline", "Con valor 'readline', Ctrl+W, Alt+F y Alt+D siguen las mismas convenciones que en una shell Bash."],
+    ["editorMode", "Activar keybindings vim", "Activa la edición del prompt con atajos de vim (equivalente a activarlo desde /config)."],
+    ["spellcheck", "Corrector ortográfico del prompt", "Usa aspell/hunspell/ispell instalado en el sistema para revisar ortografía mientras escribes."],
+    ["alwaysThinkingEnabled", "Extended thinking siempre activo", "Fuerza o desactiva por defecto el razonamiento extendido, sin tener que alternarlo cada vez con Option+T/Alt+T."],
+    ["sandbox.*", "Sandboxing de Bash", "Familia de claves para aislar filesystem, red y credenciales de los comandos Bash — una capa de seguridad adicional que no depende solo de las reglas de permiso."],
+    ["modelPicker", "Curar el selector /model", "Nuevo en v2.1.243: define una lista curada y con etiquetas propias para el selector de modelo."],
+    ["autoMemoryEnabled / autoMemoryDirectory", "Activar y ubicar la memoria automática", "Controla si la 'auto memory' entre sesiones está activa y dónde se guarda — es el sistema que usa esta propia sesión para recordar el contexto del proyecto entre conversaciones."],
+    ["crossSessionInbound", "Mensajes entrantes de otras sesiones", "Controla cómo se manejan los mensajes que llegan desde otras sesiones (cross-session messaging, ej. SendMessage entre agentes)."],
+    ["feedbackDrafts", "Cola de borradores de feedback", "Controla si los informes de bug que Claude redacta automáticamente se ponen en cola para revisión antes de enviarse."],
+  ]},
+  { cat: "Hooks (eventos de ciclo de vida)", icon: "🪝", items: [
+    ["PreToolUse / PostToolUse / PostToolUseFailure / PostToolBatch", "Hooks alrededor del uso de herramientas", "Se disparan antes de que una herramienta se ejecute, después de que termine bien, después de que falle, o tras un lote de herramientas — permiten bloquear, registrar o reaccionar a lo que Claude está a punto de hacer o acaba de hacer."],
+    ["PermissionRequest / PermissionDenied", "Hooks de permisos", "Se disparan cuando se pide o se deniega un permiso — útil para auditar qué se intentó hacer sin autorización."],
+    ["SessionStart / Setup / SessionEnd", "Hooks de ciclo de vida de sesión", "Se disparan al arrancar, durante la fase de setup, y al terminar una sesión — útil para preparar el entorno o limpiar al salir."],
+    ["UserPromptSubmit / UserPromptExpansion", "Hooks sobre el prompt del usuario", "Se disparan al enviar un mensaje, o cuando se expande (ej. al insertar contenido de un @archivo)."],
+    ["SubagentStart / SubagentStop / TaskCreated / TaskCompleted", "Hooks de subagentes y tareas", "Se disparan al arrancar/terminar un subagente, o al crear/completar una tarea delegada."],
+    ["Stop / StopFailure", "Hooks de finalización", "Se disparan cuando la sesión (o un subagente) se detiene normalmente o por fallo."],
+    ["PreCompact / PostCompact", "Hooks alrededor de /compact", "Se disparan antes y después de compactar el contexto de la conversación."],
+    ["PreModelSwitch / PostModelSwitch", "Hooks de cambio de modelo", "Nuevos en v2.1.251: se disparan antes y después de que la sesión cambie de modelo (ej. vía /model o un fallback automático)."],
+    ["TeammateIdle / InstructionsLoaded / ConfigChange / CwdChanged / DirectoryAdded / FileChanged / WorktreeCreate / WorktreeRemove", "Hooks de entorno y estado", "Se disparan ante cambios de estado del entorno: un compañero de equipo queda inactivo, se cargan instrucciones, cambia la configuración, cambia el directorio de trabajo, se añade un directorio, cambia un archivo, o se crea/elimina un worktree."],
+    ["Notification / MessageDisplay / Elicitation / ElicitationResult", "Hooks de notificaciones e interacción", "Se disparan al mostrar notificaciones o mensajes, o al pedir/recibir información adicional al usuario (elicitation) — por ejemplo de un servidor MCP."],
+    ["Tipos de handler: command / http / mcp_tool / prompt / agent", "Formas de responder a un hook", "Un hook puede ejecutar un comando local, llamar a un endpoint HTTP, invocar una tool de un servidor MCP, disparar un prompt, o lanzar un agente — según lo que necesite el evento."],
+  ]},
+  { cat: "Modos y funcionalidades de sesión", icon: "🎛️", items: [
+    ["Modos de permiso", "default, acceptEdits, plan, auto, dontAsk, bypassPermissions", "default (manual, solo lectura), acceptEdits (auto-aprueba ediciones y comandos comunes), plan (solo lee y planifica), auto (un segundo modelo 'clasificador' revisa acciones en vez de preguntarte — por defecto en planes Pro/Max/Team), dontAsk (solo herramientas pre-aprobadas, pensado para CI), bypassPermissions (nada pregunta, solo para contenedores aislados)."],
+    ["Plan Mode", "Solo lectura y planificación antes de tocar código", "En modo plan, Claude solo lee y planifica, bloqueando ediciones hasta que apruebes un plan explícito. Se activa con Shift+Tab o claude --permission-mode plan."],
+    ["Extended thinking / ultrathink", "Razonamiento más profundo en un turno", "Se activa/desactiva con Option+T / Alt+T o desde /config. La palabra disparadora confirmada en un prompt es 'ultrathink' — pide más razonamiento en ese turno concreto sin cambiar el nivel de esfuerzo guardado. Frases como 'piensa más' NO están confirmadas como triggers reconocidos."],
+    ["Memoria de subagentes (memory: user/project/local)", "Subagentes que recuerdan entre sesiones", "En el frontmatter de .claude/agents/*.md: user guarda en ~/.claude/agent-memory/<agente>/, project en .claude/agent-memory/<agente>/ (versionable en git), local en .claude/agent-memory-local/<agente>/ (no versionado). Con memoria activa, las primeras 200 líneas / 25KB de su MEMORY.md se inyectan automáticamente al arrancar el subagente."],
+    ["Checkpoints / rewind", "Restaurar código y/o conversación", "Doble Esc con prompt vacío, o /rewind. Permite restaurar código y conversación, solo conversación, solo código, o comprimir la conversación desde/hasta ese punto. No rastrea cambios de comandos Bash ni de subagentes normales."],
+    ["Worktrees", "Sesión aislada en una rama nueva", "--worktree <nombre> (o -w) crea un git worktree bajo .claude/worktrees/<nombre>/. Claude también puede crearlos sola con la herramienta EnterWorktree. Un archivo .worktreeinclude copia archivos gitignored (como .env) a cada worktree nuevo."],
+    ["Tareas en background", "Trabajo paralelo sin bloquear la sesión", "Ctrl+B manda un Bash en marcha a segundo plano; --bg/--background arranca toda la sesión en background; claude agents da una vista para monitorizar y despachar sesiones paralelas."],
+  ]},
+  { cat: "Integraciones", icon: "🔗", items: [
+    ["Extensión VS Code", "Claude Code dentro del editor", "Interfaz gráfica nativa: revisar/editar planes antes de aceptarlos, auto-aceptar ediciones, mencionar archivos con @ incluyendo rangos de línea desde la selección, pestañas múltiples. Alt+K/Option+K inserta la referencia @archivo.ts#5-10 de la selección actual; Ctrl+Alt+F activa el 'Focus view' que oculta las llamadas a herramientas."],
+    ["Extensión JetBrains", "IntelliJ, PyCharm, Android Studio, WebStorm, PhpStorm, GoLand", "Cmd/Ctrl+Esc lanza Claude Code, Cmd/Ctrl+Alt+K inserta referencia de archivo, los diffs se muestran en el visor nativo del IDE. Corre un servidor MCP local ('ide') que expone getDiagnostics (errores/warnings del IDE) directamente a Claude."],
+    ["Slack — Claude Tag", "@Claude compartido en el workspace", "Reemplaza la integración anterior que corría como asistente personal de cada usuario. Claude Tag corre como identidad compartida de la organización, visible para todo el canal; mencionar @Claude con una tarea de código crea automáticamente una sesión de Claude Code en la web."],
+    ["GitHub Actions", "Claude Code como paso de CI/CD", "anthropics/claude-code-action. /install-github-app hace el setup rápido (instala la GitHub App, configura el secret, prepara el PR del workflow). Modo interactivo (responde a @claude en issues/PRs) o modo automatización (prompt fijo en cualquier evento, incluido cron). Soporta autenticación sin secretos vía workload identity federation (OIDC)."],
+    ["MCP — scopes", "local, project, user", "claude mcp add --transport http/stdio/sse <nombre> <url/comando>. local (solo este proyecto, en ~/.claude.json), project (compartido vía .mcp.json en el repo), user (todos tus proyectos). Autenticación OAuth 2.0 con claude mcp login/logout, o headersHelper para esquemas no-OAuth (Kerberos, SSO interno)."],
+    ["Autenticación MCP gestionada por empresa", "Conectores autorizados centralmente por el admin — GA 24/08/2026", "Admins de Claude Team/Enterprise provisionan acceso a conectores vía su Identity Provider; Claude presenta un JWT firmado por el IdP y obtiene el token en una sola petición back-channel, sin redirección de navegador por conector. Conectores soportados: Datadog, Notion, Slack (Exa/Miro/Zoom próximamente), Asana, Atlassian, Canva, Figma, Granola, Linear, Supabase."],
+  ]},
+  { cat: "Novedades 2026 (changelog oficial)", icon: "🆕", items: [
+    ["/color", "Colorear la barra de una sesión", "Pinta la barra del prompt de la sesión actual (red, blue, green, yellow, purple, orange, pink, cyan) para distinguir varias sesiones abiertas a la vez. El color se resetea al abrir una sesión nueva; no persiste aún entre sesiones distintas."],
+    ["/rename", "Nombrar la sesión actual", "Renombra la sesión — el nombre aparece también en la barra del prompt y en el selector /resume. Renombrar desde la app de escritorio aplica el mismo nombre en la CLI."],
+    ["Remote Control / móvil", "Sesión Code tab en el móvil", "claude remote-control (o --rc) conecta claude.ai/code o la app móvil de Claude a una sesión local; el código sigue corriendo en tu máquina, el móvil es solo el mando. Desde v2.1.251 se ve en directo el streaming de llamadas a herramientas de subagentes en primer plano hacia los clientes de Remote Control."],
+    ["Informes de bug automáticos (SendFeedback)", "Claude redacta el informe por ti", "Nuevo en v2.1.247: cuando algo falla en la sesión, Claude puede redactar un informe de feedback/bug automáticamente. Los borradores se guardan localmente en ~/.claude/feedback/drafts/ y NO se envían a Anthropic hasta que los apruebas explícitamente desde /feedback o /bug."],
+    ["/claude-api cost-optimize", "Reducir el gasto de la API de Claude", "Nuevo en v2.1.247: perfila el gasto real de un proyecto que llama a la API de Claude y trabaja las palancas de coste (caché, batching, esfuerzo, elección de modelo) una por una, midiendo cada cambio antes de seguir con el siguiente."],
+    ["/permissions — pestaña de modo automático", "Editar reglas allow/deny visualmente", "Nueva pestaña en /permissions que lista cada regla allow, soft_deny y hard_deny que usa el clasificador del modo automático — se añaden o cambian reglas ahí en vez de editar JSON a mano."],
+    ["/usage — desglose de tareas /loop", "Ver qué cuesta cada tarea programada", "Cada tarea /loop tiene ahora su propia línea en /usage con la frecuencia de ejecución y los tokens gastados, para ver de un vistazo cuánto cuesta cada una."],
+  ]},
+  { cat: "Skills · Azure", icon: "🔷", items: [
+    ["/airunway-aks-setup", "Configura AI Runway en AKS de cero a modelo corriendo: cluster, controller, GPU, proveedor y primer despliegue", "Cubre desde verificar el cluster hasta el primer despliegue de un modelo (KAITO, vLLM u otro runtime) sobre AKS, incluyendo evaluación de GPU disponible."],
+    ["/appinsights-instrumentation", "Guía para instrumentar webapps con Azure Application Insights: telemetría, SDK, configuración", "Da patrones de telemetría y configuración del SDK para saber qué instrumentar y cómo en una app existente."],
+    ["/azure-ai", "Azure AI: Search, Speech, OpenAI, Document Intelligence — búsqueda vectorial/híbrida, voz, OCR", "• Búsqueda en AI Search: full-text, vectorial, híbrida y semántica sobre índices existentes\n• Enriquecimiento con IA: extracción de entidades, OCR y análisis de sentimiento en la indexación\n• Convierte voz a texto y texto a voz con diarización de hablantes y voces neuronales\n• Consulta modelos GPT/embeddings de OpenAI y extrae datos de formularios con Document Intelligence"],
+    ["/azure-aigateway", "Configura Azure API Management como AI Gateway para modelos, herramientas MCP y agentes", "• Configura Azure API Management como gateway de IA: añade backends de Azure OpenAI o AI Foundry\n• Aplica caché semántica y límites de tokens para reducir coste y controlar consumo\n• Filtra contenido dañino y detecta jailbreaks con políticas de seguridad LLM\n• Limita la tasa de uso de herramientas/MCP y balancea carga entre modelos\n• Convierte una API existente en servidor MCP e importa specs OpenAPI al gateway\n• Prueba el endpoint de IA a través del gateway y expone métricas de uso de tokens"],
+    ["/azure-app-onboard", "Orquestador de idea de negocio a despliegue en Azure: detecta servicios, estima costes, despliega", "• Orquesta el pipeline completo: analiza el repo, detecta servicios Azure necesarios y genera el plan\n• Delega la evaluación de preparación del código a azure-app-onboard-prereq antes de planificar\n• Genera infraestructura (IaC) y hace scaffold del proyecto tras aprobación del usuario\n• Presenta estimación de costes y pide aprobación antes de desplegar\n• Ejecuta el despliegue final y entrega URLs, identidad y comandos de limpieza\n• Redirige a azure-cloud-migrate si detecta SDKs de otra nube (AWS/GCP) en el código"],
+    ["/azure-app-onboard-prereq", "Evalúa si el código está listo para desplegar en Azure antes de tocar infraestructura", "• Escanea el repo para detectar stack, dependencias, infraestructura y servicios ya usados\n• Evalúa build, completitud de la app y viabilidad de despliegue (veredictos PASS/WARN/FAIL) sin instalar ni compilar nada\n• Detecta SDKs de AWS/GCP en el código y ofrece redirigir a azure-cloud-migrate\n• Ejecuta un ciclo de remediación guiado cuando hay bloqueos, con verificación estática\n• Enruta al final hacia azure-app-onboard (pipeline completo) o azure-prepare según el resultado"],
+    ["/azure-cloud-migrate", "Evalúa y migra cargas cross-cloud a Azure con informes y conversión de código", "• Migra AWS Lambda a Azure Functions con evaluación y conversión de código\n• Migra Beanstalk, Heroku o App Engine a Azure App Service\n• Migra Fargate/ECS, Kubernetes (GKE/EKS/self-hosted), Cloud Run o Spring Boot a Azure Container Apps\n• Genera un informe de evaluación antes de tocar ningún código\n• Detecta nombres de servicio hardcodeados (DNS de Kubernetes) que no resolverán en Container Apps\n• Entrega a azure-prepare para infraestructura, pruebas y despliegue final"],
+    ["/azure-compliance", "Auditorías de cumplimiento y seguridad en Azure con azqr y comprobación de Key Vault", "• Ejecuta escaneos de cumplimiento con azqr sobre suscripción o grupo de recursos\n• Audita Key Vault: detecta certificados, secretos y claves caducados o próximos a caducar\n• Identifica recursos huérfanos o mal configurados frente a buenas prácticas\n• Clasifica hallazgos por prioridad (crítico/alto/medio/bajo) y propone remediación"],
+    ["/azure-compute", "Router de VM/VMSS de Azure: crear, dimensionar, comparar precios, autoscaling", "• VM Recommender: recomienda tamaño de VM/VMSS, compara pricing y valora autoscaling\n• VM Creator: crea o aprovisiona una VM o VMSS “en bruto” (no aplicaciones)\n• Capacity Reservation: crea, asocia o desasocia grupos de reserva de capacidad (CRG)\n• Essential Machine Management: gestiona el enrolamiento y monitorización de máquinas (EMM)\n• Deriva a azure-prepare cuando la petición es desplegar una aplicación, no infraestructura de VM"],
+    ["/azure-cost", "Gestión de costes de Azure: consultar, prever y optimizar el gasto", "• Cost Query: desglosa y explica el gasto actual en Azure por ámbito (suscripción, grupo de recursos, etc.)\n• Cost Optimization: detecta desperdicio, recursos huérfanos y oportunidades de rightsizing (VMs, AKS, Redis, Storage)\n• Cost Forecast: proyecta el gasto futuro a partir de tendencias históricas\n• Incluye guías de optimización específicas para Redis y Storage"],
+    ["/azure-deploy", "Ejecuta despliegues de Azure ya preparados: azd up/deploy, terraform apply, az deployment", "• Ejecuta azd up / azd deploy / terraform apply / az deployment sobre un plan ya validado\n• Exige que exista .azure/deployment-plan.md con estado “Validated” antes de tocar nada\n• Corre un checklist pre-deploy y verifica salud de roles RBAC (p.ej. AcrPull en Container Apps+ACR)\n• Recupera de errores comunes de despliegue siguiendo la receta según el tipo de recurso\n• Verifica el éxito del despliegue y reporta las URLs finales con esquema https://"],
+    ["/azure-diagnostics", "Depura incidencias de producción en Azure: AppLens, Monitor, resource health", "• Diagnostica App Service (CPU alta, fallos de despliegue, TLS/dominios) y Container Apps (image pull, cold start, health probes)\n• Diagnostica Function Apps: fallos de invocación, timeouts, errores de binding, App Insights vinculado\n• Enruta incidentes de AKS (nodos, pods, CoreDNS, crashloop) a la guía dedicada de troubleshooting\n• Enruta problemas de conectividad de VM (RDP/SSH, NSG, reset de contraseña) a la guía de compute\n• Enruta errores de SDK de mensajería (Event Hubs, Service Bus, AMQP) a la guía de messaging\n• Usa AppLens y Azure Monitor/KQL para análisis de causa raíz y salud del recurso"],
+    ["/azure-enterprise-infra-planner", "Arquitectura de infraestructura Azure empresarial: redes, identidad, seguridad, cumplimiento", "• Diseña topologías de red hub-spoke, VNets, firewalls y private endpoints a escala empresarial\n• Planifica landing zones, identidad, RBAC e infraestructura orientada a cumplimiento\n• Genera Bicep o Terraform directamente (sin azd) para despliegues multi-recurso o a nivel de suscripción\n• Planifica disaster recovery y topologías multi-región alineadas al Well-Architected Framework\n• Ejecuta las 7 fases de planificación e IaC descritas en su workflow.md"],
+    ["/azure-kubernetes", "Planifica, crea y configura clusters AKS listos para producción", "• Recomienda SKU de AKS (Automatic vs Standard) y decisiones de red de Día-0 (CNI Overlay, egress, API server)\n• Define seguridad del clúster: Entra ID, Workload Identity, Key Vault CSI Driver, Azure Policy\n• Configura observabilidad (Managed Prometheus, Container Insights, Grafana) y estrategia de upgrades\n• Rightsizing de pods y recomendaciones de Vertical Pod Autoscaler (VPA)\n• Configura autoscaler de clúster y node pools Spot para cargas interrumpibles\n• Deriva el despliegue de apps sobre un clúster ya existente a azure-kubernetes-app-deploy"],
+    ["/azure-kusto", "Consulta y analiza datos en Azure Data Explorer (Kusto/ADX) con KQL", "• Ejecuta consultas KQL sobre clusters de Azure Data Explorer para logs, telemetría o IoT\n• Explora el esquema de tablas antes de consultar (columnas, tipos de datos)\n• Genera agregaciones, series temporales y correlaciones entre tablas (joins)\n• Lista clusters y bases de datos disponibles en la suscripción\n• Usa CLI de Azure como fallback si el servidor MCP de Kusto falla o da timeout"],
+    ["/azure-messaging", "Diagnostica y resuelve problemas de Event Hubs y Service Bus", "• Diagnostica fallos de conexión, autenticación y enlaces AMQP en Event Hubs y Service Bus\n• Resuelve message lock / session lock perdidos o expirados y fallos de renovación\n• Investiga procesadores de eventos que dejan de procesar, duplicados o resets de checkpoint/offset\n• Revisa configuración del SDK (retry, prefetch, tamaño de batch) según el lenguaje usado"],
+    ["/azure-prepare", "Prepara proyectos azd: genera azure.yaml, infraestructura y Dockerfiles", "• Analiza el workspace (nuevo, modificación o modernización) y escanea código para detectar componentes y dependencias\n• Genera azure.yaml, Bicep/Terraform y Dockerfiles para el flujo de Azure Developer CLI (azd)\n• Escribe y mantiene actualizado .azure/deployment-plan.md como fuente de verdad del despliegue\n• Deriva a skills especializadas (python-appservice-deploy, azure-cloud-migrate, azure-aigateway) según la tecnología detectada\n• Aplica hardening de seguridad (nunca genera credenciales SQL, fuerza auth solo con Entra ID)\n• Entrega obligatoriamente a azure-validate antes de permitir cualquier despliegue"],
+    ["/azure-quotas", "Comprueba y gestiona cuotas y uso de Azure entre proveedores", "• Consulta límites y uso actual de cuotas (vCPU, IPs, Container Apps, etc.) por región y proveedor\n• Compara disponibilidad de cuota entre varias regiones para elegir dónde desplegar\n• Solicita incrementos de cuota vía CLI y hace seguimiento del estado de la solicitud\n• Mapea el nombre de recurso ARM al nombre real usado por la API de cuotas (no son 1:1)"],
+    ["/azure-reliability", "Evalúa y mejora la fiabilidad de apps PaaS (zonal, ZRS, health probes, failover)", "• Evalúa redundancia de zona en cómputo (App Service/Functions) y almacenamiento (LRS/ZRS/GRS)\n• Detecta ausencia de health probes y de failover multi-región\n• Presenta un checklist de fiabilidad por característica y guía la remediación por etapas con confirmación del usuario\n• Aplica fixes en vivo por CLI o parchea Bicep/Terraform, desplegando los cambios él mismo\n• Genera IaC de failover multi-región con Front Door tras confirmación explícita del usuario"],
+    ["/azure-resource-lookup", "Lista y busca recursos Azure entre suscripciones o grupos de recursos", "• Lista o busca recursos de cualquier tipo (VMs, web apps, storage, container apps...) en suscripción o grupo\n• Encuentra recursos huérfanos: discos sin adjuntar, NICs no usadas, IPs inactivas\n• Detecta recursos sin etiquetas requeridas o en estado fallido/detenido\n• Usa Azure Resource Graph (KQL) cuando no existe herramienta MCP dedicada, como para listar App Services"],
+    ["/azure-resource-visualizer", "Genera diagramas Mermaid de arquitectura a partir de un grupo de recursos", "• Descubre todos los recursos de un grupo de recursos y sus configuraciones clave\n• Mapea relaciones reales entre recursos: red, flujo de datos, identidad y dependencias\n• Genera un diagrama Mermaid detallado agrupado por capas (red, cómputo, datos, seguridad)\n• Produce un archivo markdown con inventario de recursos y el diagrama embebido"],
+    ["/azure-storage", "Blob, File Shares, Queue, Table y Data Lake: niveles de acceso y ciclo de vida", "• Explica y compara niveles de acceso de blobs (hot/cool/cold/archive) según frecuencia de uso\n• Lista, sube y descarga blobs, contenedores y cuentas de almacenamiento\n• Orienta sobre File Shares (SMB), Queue Storage (mensajería async) y Table/Data Lake\n• Compara opciones de redundancia (LRS/ZRS/GRS/GZRS) según necesidad de durabilidad"],
+    ["/azure-upgrade", "Evalúa y actualiza entre planes/tiers/SKUs, o moderniza dependencias del SDK de Azure", "• Sube el plan de Azure Functions de Consumption a Flex Consumption con evaluación previa\n• Migra Azure Cache for Redis (ACR/ACRE) a Azure Managed Redis (AMR)\n• Moderniza SDKs Java legacy (com.microsoft.azure) a la librería moderna (com.azure)\n• Valida el endpoint tras el upgrade y deja rastro del progreso en upgrade-status.md\n• Entrega a azure-validate o azure-deploy tras completar el upgrade"],
+    ["/azure-validate", "Validación previa al despliegue: configuración, Bicep/Terraform, RBAC, identidad administrada", "• Ejecuta un script de validación paso a paso (workflow.ps1/.sh) sobre config, IaC, RBAC e identidades gestionadas\n• Verifica permisos y asignaciones de rol antes de permitir el despliegue\n• Es la única skill autorizada para marcar el plan como “Validated”\n• Tras validar, invoca azure-deploy si el usuario pidió desplegar, o se detiene si solo pidió validar"],
+    ["/python-appservice-deploy", "Despliegue de apps Python en Azure App Service", "Específico para apps Python, sin pasar por azd."],
+  ]},
+  { cat: "Skills · Identidad (Entra ID)", icon: "🪪", items: [
+    ["/entra-agent-id", "Aprovisiona Agent Identity Blueprints y configura OAuth 2.0 para agentes (fmi_path, OBO)", "• Aprovisiona Agent Identity Blueprints, sus BlueprintPrincipals y las Agent Identities por instancia vía Microsoft Graph\n• Configura el intercambio de tokens OAuth 2.0 con fmi_path para autenticar cada instancia de agente\n• Habilita On-Behalf-Of (OBO) y escenarios cross-tenant para que un agente actúe en nombre de un usuario u otro agente\n• Integra Workload Identity Federation sin secretos, incluida la SDK de Microsoft Entra para el sidecar de AgentID\n• Da soporte a stacks poliglotas (Microsoft.Identity.Web.AgentIdentities y equivalentes)\n• Deriva a /entra-app-registration para registro de apps clásico y a /microsoft-foundry para autoría de agentes Foundry"],
+    ["/entra-app-registration", "Registro de apps en Microsoft Entra ID, OAuth 2.0 e integración MSAL", "• Registra una app nueva en Microsoft Entra ID (Azure AD) y configura sus URIs de redirección\n• Configura autenticación OAuth 2.0 (authorization code, client credentials) según el tipo de aplicación\n• Añade permisos de API (delegados o de aplicación) y gestiona el consentimiento del administrador\n• Genera un service principal y credenciales para automatización o apps de servicio\n• Da ejemplos de integración MSAL para apps de consola, web y móviles\n• No cubre gestión de secretos en Key Vault ni seguridad general de recursos Azure, eso queda fuera de su alcance"],
+  ]},
+  { cat: "Skills · Power Platform / Dataverse / Copilot Studio", icon: "⚡", items: [
+    ["/code-app", "Crea, extiende y despliega Power Apps Code Apps (connector-first, memory-bank)", "Sigue el estándar oficial del plugin code-apps: primero conectores, luego política de planificación."],
+    ["/microsoft-foundry", "Autoría de agentes en Microsoft Foundry", "Para crear/gestionar agentes en la plataforma Foundry de Microsoft."],
+    ["/model-driven-apps", "Crea y despliega páginas generativas para apps model-driven (React + Fluent UI V9)", "Para páginas custom dentro de una app model-driven, no Canvas App."],
+    ["/power-bi-modeling-mcp-server", "Modelado semántico de Power BI (PBIP/TMDL) vía MCP Server oficial", "Para trabajar el modelo semántico de un informe Power BI directamente en formato de proyecto."],
+  ]},
+  { cat: "Skills · Meta (crear/gestionar skills y agentes)", icon: "🧩", items: [
+    ["/agent-customization", "Crea, actualiza y depura archivos de personalización de agentes (SKILL.md, AGENTS.md...)", "Cubre .instructions.md, .prompt.md, .agent.md, patrones applyTo, restricciones de herramientas y sintaxis de frontmatter YAML."],
+    ["/design-md", "Define y valida un DESIGN.md para guiar la generación de interfaces coherentes", "Colores, tipografía, spacing, componentes y reglas visuales para que las UIs generadas sean consistentes."],
+    ["/find-skills", "Descubre skills existentes del repo o del ecosistema abierto", "Busca en skills.sh y npx skills find antes de crear una skill nueva desde cero."],
+    ["/skill-creator", "Crea nuevas skills reutilizables con SKILL.md válido y estructura estándar", "El punto de partida recomendado para empaquetar un flujo de trabajo repetible como skill."],
+    ["/update-config", "Configura el harness de Claude Code vía settings.json (hooks, permisos, env vars)", "Para automatizar comportamientos ('cada vez que X, haz Y') que requieren un hook real, no solo memoria."],
+    ["/keybindings-help", "Personaliza atajos de teclado y ~/.claude/keybindings.json", "Para rebindear teclas o añadir chords personalizados."],
+    ["/fewer-permission-prompts", "Escanea transcripciones y añade allowlist para reducir prompts de permiso", "Analiza qué comandos Bash/MCP de solo lectura se repiten y los añade a la allowlist del proyecto."],
+  ]},
+  { cat: "Skills · Artifacts y diseño avanzado", icon: "🎨", items: [
+    ["/artifact-design", "Guía de diseño y fundamentos para Artifacts, previa a escribir cualquier artifact", "Obligatoria de cargar antes de publicar cualquier página HTML como Artifact, incluida una en Markdown."],
+    ["/artifact-diagramming", "Cómo dibujar diagramas que muestren el mecanismo real dentro de un Artifact", "Cubre la mecánica de SVG inline para que el diagrama se vea bien en claro y oscuro."],
+    ["/artifact-capabilities", "Capacidades runtime que puede tener una página Artifact publicada (estado, datos en vivo...)", "Para páginas que necesitan recordar qué hace la gente, compartir estado entre viewers, o guardar archivos."],
+  ]},
+  { cat: "Skills · Productividad y sesión", icon: "⏱️", items: [
+    ["/loop", "Ejecuta un prompt o slash command en un intervalo recurrente, con auto-ritmo si se omite el intervalo", "Para tareas que hay que repetir cada X minutos, o que Claude puede auto-espaciar según lo que encuentre."],
+    ["/workflow-authoring", "Referencia para escribir un script de Workflow (orquestación multi-subagente)", "Necesaria antes de escribir un script para la herramienta Workflow — no autoriza por sí sola a ejecutarlo."],
+    ["/run", "Lanza y ejecuta la app del proyecto para comprobar un cambio de verdad, no solo con tests", "Busca primero una skill propia del proyecto para arrancar la app; si no existe, usa patrones genéricos según el tipo de proyecto."],
+    ["/claude-api", "Referencia de la Claude API / Anthropic SDK: modelos, precios, streaming, tool use, MCP, caching", "Se dispara automáticamente cuando se detecta trabajo relacionado con LLMs sin proveedor explícito, no solo cuando se nombra a Claude."],
+  ]},
+];
+
+const codexData = [
+  { cat: "Codex vía Claude Code (plugin openai-codex v1.0.6)", icon: "🔗", items: [
+    ["/codex:review", "Ejecuta una revisión de código de Codex contra el estado local de git", "• Analiza el diff local de git (staged + unstaged), no requiere PR ni push previo\n• Busca bugs, problemas de diseño y casos borde desde la perspectiva de Codex, independiente de la sesión de Claude que hizo el cambio\n• Corre como job en segundo plano vía el runtime codex-cli-runtime, sin bloquear la sesión\n• Útil como segunda opinión antes de dar por cerrada una tarea, sin gastar contexto de la sesión principal\n• El resultado queda disponible después con /codex:result aunque cambies de tarea mientras corre"],
+    ["/codex:adversarial-review", "Revisión de Codex que cuestiona el enfoque de implementación y las decisiones de diseño", "• Pensada para no compartir los puntos ciegos de la sesión de Claude que implementó el cambio\n• Cuestiona el enfoque elegido, no solo busca bugs puntuales: alternativas de diseño, simplificaciones, riesgos de mantenimiento\n• Corre igual que /codex:review sobre el diff local de git, sin requerir PR\n• Recomendable antes de mergear cambios grandes o decisiones arquitectónicas discutibles\n• El resultado se consulta después con /codex:result o /codex:status"],
+    ["/codex:rescue", "Delega investigación, un fix explícito o trabajo de rescate a Codex", "• Útil cuando Claude Code se queda atascado tras varios intentos fallidos sobre el mismo problema\n• Puede recibir una investigación abierta (\"por qué falla X\") o un fix explícito ya diagnosticado\n• Corre como job en segundo plano vía el runtime codex-companion, sin bloquear la sesión de Claude\n• Da una investigación de causa raíz independiente, con herramientas y contexto propios de Codex\n• Se puede cancelar con /codex:cancel o consultar su resultado con /codex:result"],
+    ["/codex:setup", "Comprueba si el Codex CLI local está listo; activa/desactiva el gate de revisión", "• Verifica que el Codex CLI local está instalado y disponible antes de delegar cualquier trabajo\n• Comprueba versión del plugin (openai-codex v1.0.6) y del binario codex\n• Permite activar/desactivar el gate de revisión obligatoria (forzar que toda tarea pase por Codex antes de cerrarse)\n• Primer paso recomendado si /codex:review o /codex:rescue fallan de forma extraña"],
+    ["/codex:status", "Muestra trabajos de Codex activos y recientes en este repo", "• Lista los jobs de Codex activos y recientes lanzados desde este repo\n• Muestra si un job sigue corriendo, ya terminó, o fue cancelado\n• Útil para no perder de vista un /codex:rescue o /codex:review lanzado en segundo plano\n• No requiere salir de Claude Code para comprobar el progreso"],
+    ["/codex:result", "Muestra el resultado final guardado de un job de Codex terminado", "• Recupera el resultado final guardado de un job de Codex ya terminado\n• Evita tener que relanzar la tarea si solo quieres releer la conclusión\n• Se combina con /codex:status para saber primero qué jobs hay disponibles\n• El formato de presentación sigue la guía interna codex:codex-result-handling"],
+    ["/codex:cancel", "Cancela un job de Codex en segundo plano activo", "• Detiene un job de Codex en segundo plano que sigue corriendo\n• Útil si se lanzó por error o si el contexto de la tarea cambió antes de que terminara\n• No borra el resultado parcial ya generado hasta el momento de la cancelación"],
+    ["/codex:transfer", "Transfiere la sesión actual de Claude Code a un hilo de Codex reanudable", "• Convierte la sesión actual de Claude Code en un hilo de Codex que se puede continuar de forma independiente\n• Traspasa el contexto acumulado, no solo el último mensaje\n• Útil para migrar una tarea larga a Codex Cloud o al Codex CLI nativo sin perder el hilo\n• El hilo resultante es reanudable como cualquier otro chat de Codex"],
+  ]},
+  { cat: "Skills internas de soporte (no se invocan a mano)", icon: "🔧", items: [
+    ["codex:codex-cli-runtime", "Contrato interno para llamar al runtime de codex-companion desde Claude Code", "Infraestructura interna que usan los comandos /codex:* — no se invoca directamente."],
+    ["codex:codex-result-handling", "Guía interna para presentar el resultado de Codex de vuelta al usuario", "Define cómo se formatea y resume lo que Codex devuelve antes de mostrarlo."],
+    ["codex:gpt-5-4-prompting", "Guía de prompting específica para modelos GPT-5.x usados por Codex", "Ajusta cómo se le habla al modelo GPT-5.x subyacente para obtener mejores resultados."],
+    ["codex-computer-use", "Diagnostica, configura y usa Codex Computer Use en Windows/macOS (apps permitidas, permisos)", "Guía sobre el control de aplicaciones de escritorio: qué apps están permitidas, revisión de permisos y límites de seguridad."],
+  ]},
+  { cat: "Codex CLI nativo · Terminal (TUI)", icon: "💻", items: [
+    ["/permissions", "Define qué puede hacer Codex sin pedir permiso antes", "Configura la política de aprobación de la sesión (equivalente a approval_policy en config.toml: untrusted, on-request, never)."],
+    ["/ide", "Incluye archivos abiertos, selección actual y contexto del IDE", "Comparte con Codex lo que tienes abierto y seleccionado en el editor, sin tener que copiarlo a mano."],
+    ["/keymap", "Remapea atajos de teclado del TUI", "Inspecciona y personaliza los atajos de teclado de la interfaz de terminal."],
+    ["/vim", "Alterna el modo Vim para el editor de prompts", "Activa navegación y edición estilo vim en el composer de prompts."],
+    ["/setup-default-sandbox", "Configura el sandbox elevado del agente (solo Windows)", "Prepara el sandbox nativo de Windows para que Codex pueda operar con las restricciones correctas."],
+    ["/sandbox-add-read-dir", "Da acceso de lectura al sandbox a un directorio extra (solo Windows)", "Amplía qué puede leer el sandbox sin salir del nivel de aislamiento configurado."],
+    ["/agent", "Cambia el hilo de agente activo", "Alterna entre distintos hilos de agente dentro de la misma sesión."],
+    ["/subagents", "Cambia el hilo de agente activo (subagentes)", "Variante de /agent centrada en subagentes lanzados dentro de la sesión."],
+    ["/apps", "Explora apps (conectores) e insértalas en el prompt", "Navega los conectores/plugins disponibles (Slack, Figma, Notion, Gmail, Drive...) e inserta uno en el prompt."],
+    ["/plugins", "Explora plugins instalados y disponibles", "Lista los plugins que extienden Codex con skills y conexiones a servicios externos."],
+    ["/hooks", "Ver y gestionar hooks de ciclo de vida", "Muestra los hooks configurados en config.toml/hooks.json (PreToolUse, PostToolUse, SessionStart, etc.)."],
+    ["/clear", "Limpia el terminal y empieza un chat nuevo", "Equivalente al /clear de Claude Code, pero en el TUI de Codex."],
+    ["/rename", "Renombra el chat actual", "Cambia el nombre visible de la sesión de Codex."],
+    ["/archive", "Archiva la sesión actual y sale de Codex", "Oculta la sesión sin borrarla (recuperable con codex unarchive)."],
+    ["/delete", "Borra permanentemente la sesión actual y sale de Codex", "Elimina la sesión sin posibilidad de recuperarla — a diferencia de /archive."],
+  ]},
+  { cat: "Codex CLI nativo · Composer / App", icon: "🖥️", items: [
+    ["/model", "Elige el modelo para el chat actual", "Cambia el modelo (ej. GPT-5.4, GPT-5.4 mini) sin reiniciar la sesión."],
+    ["/status", "Muestra el ID del chat, uso de contexto y límites de tasa", "Panel de estado equivalente a /status en Claude Code."],
+    ["/compact", "Compacta el contexto del chat actual", "Resume la conversación para liberar espacio de contexto."],
+    ["/reasoning", "Elige el nivel de esfuerzo de razonamiento del chat actual", "Ajusta minimal/low/medium/high/xhigh según lo que soporte el modelo activo."],
+    ["/personality", "Elige cómo responde Codex, si el modelo lo soporta", "Cambia el tono/estilo de respuesta cuando el modelo lo permite."],
+    ["/plan", "Alterna el modo de planificación multi-paso", "Activa un modo donde Codex planifica antes de ejecutar cambios grandes."],
+    ["/goal", "Define un objetivo persistente (usar /plan antes para darle forma)", "Fija un objetivo que persiste a lo largo de la sesión, útil junto a /plan; también gestionable desde Codex Mobile."],
+    ["/review", "Modo de revisión de código: cambios sin commitear o comparar contra rama base", "Equivalente interactivo del subcomando codex review — revisa el diff actual o contra una rama."],
+    ["/approve", "Aprueba un reintento tras una denegación automática de revisión", "Fuerza que una acción bloqueada por Auto-review se ejecute igualmente."],
+    ["/init", "Genera un scaffold de AGENTS.md para el proyecto actual", "Crea un AGENTS.md inicial, el equivalente de Codex a un CLAUDE.md."],
+    ["/mcp", "Abre el estado de MCP para ver servidores conectados", "Panel de servidores MCP configurados y su estado de conexión/autenticación."],
+    ["/memories", "Configura si el chat puede usar/generar memorias", "Activa o desactiva que la sesión lea/escriba memoria persistente."],
+    ["/fast", "Activa/desactiva el nivel de servicio rápido (Fast), si está disponible", "Prioriza velocidad de respuesta sobre profundidad, cuando el plan lo soporta."],
+    ["/fork", "Copia un chat local en un chat local nuevo o worktree", "Bifurca la conversación actual, opcionalmente hacia un nuevo worktree de git."],
+    ["/worktree", "Ejecuta el chat en un nuevo worktree de Git", "Aísla los cambios de esta sesión en un worktree separado del checkout principal."],
+    ["/local", "Ejecuta el chat en el proyecto local seleccionado", "Uno de los 3 modos de entorno (junto a Worktree y Cloud) — corre en tu máquina sobre el directorio del proyecto tal cual."],
+    ["/project", "Elige un proyecto para chats nuevos", "Fija el proyecto por defecto para conversaciones que arranques a partir de ahora."],
+    ["/task", "Empieza un chat sin proyecto", "Arranca una conversación suelta, no asociada a ningún proyecto concreto."],
+    ["/side", "Chat temporal en paralelo sin interrumpir el chat principal", "Desde junio 2026 admite /side <prompt> para arrancar la conversación paralela con una pregunta inicial ya incluida."],
+    ["/cloud", "Ejecuta el chat en la nube, si está disponible", "El tercer modo de entorno: la tarea corre en un contenedor aislado en Codex Cloud, no en tu máquina."],
+    ["/cloud-environment", "Elige el entorno de nube para el chat", "Selecciona qué Environment (dependencias, setup scripts, variables/secrets) usar para la tarea en la nube."],
+    ["/ide-context", "Activa/desactiva el contexto compartido de IDE", "Controla si Codex recibe automáticamente archivos abiertos y selección del IDE conectado."],
+    ["/feedback", "Abre el diálogo de feedback, con logs opcionales", "Envía feedback a OpenAI, opcionalmente adjuntando logs de la sesión."],
+    ["/pet", "Despierta o esconde la mascota de escritorio", "Función decorativa de la app de escritorio de Codex."],
+  ]},
+  { cat: "Atajos de teclado (TUI)", icon: "⌨️", items: [
+    ["↑ / ↓", "Recuperar borradores del historial", "Recorren los prompts anteriores de la sesión actual, igual que el historial de una shell."],
+    ["Ctrl+R", "Buscar en el historial de prompts", "Búsqueda interactiva; Enter usa el resultado encontrado, Esc cancela la búsqueda."],
+    ["Tab", "Encolar un prompt/comando de seguimiento", "Mientras Codex sigue trabajando, encola un prompt, slash command o comando de shell para ejecutarlo al terminar el turno actual."],
+    ["Enter (durante ejecución)", "Inyectar instrucciones al vuelo", "Añade nuevas instrucciones al turno en curso sin esperar a que termine."],
+    ["Esc Esc", "Editar el último mensaje y bifurcar", "Doble Esc edita tu último mensaje y bifurca (fork) el chat desde ese punto. Un solo Esc solo interrumpe la tarea en curso, no cierra Codex."],
+    ["Ctrl+C / /exit", "Cerrar la sesión", "Termina la sesión actual de Codex."],
+    ["@", "Buscar archivo del workspace", "Busca un archivo por nombre y añade su ruta al prompt."],
+    ["! (prefijo)", "Ejecutar shell local", "Ejecuta un comando de shell bajo la política de sandbox/aprobación activa."],
+    ["Ctrl+O / /copy", "Copiar la última salida", "Copia al portapapeles la respuesta completa más reciente de Codex."],
+    ["/", "Abrir el popup de slash commands", "Muestra el listado de comandos disponibles para autocompletar."],
+    ["Ctrl+G", "Abrir el prompt en tu editor externo", "Usa $VISUAL (o $EDITOR) para componer prompts largos; al guardar y cerrar, el texto vuelve al composer."],
+    ["Cmd/Ctrl+F", "Buscar dentro de reviews/diffs", "Arranca la búsqueda con la selección de texto actual, dentro de una revisión de código."],
+    ["Cmd/Ctrl+Enter", "Feedback de aprobación personalizado", "Envía feedback específico sobre una decisión de aprobación, en vez de solo aprobar/denegar."],
+  ]},
+  { cat: "Flags y subcomandos (codex ...)", icon: "🚩", items: [
+    ["--model, -m", "Sobrescribe el modelo configurado", "• Fija el modelo para esa invocación concreta, por encima de config.toml\n• Útil para probar un modelo distinto sin editar la configuración persistente\n• --profile también puede definir modelo, pero el flag explícito en línea de comandos gana\n• Afecta solo a la sesión actual; la próxima invocación vuelve a usar el modelo de config.toml"],
+    ["--sandbox, -s", "Política de sandbox", "• read-only: el agente solo puede inspeccionar archivos, no editarlos ni ejecutar comandos sin aprobación\n• workspace-write: leer + editar/ejecutar dentro del workspace, el modo por defecto local\n• danger-full-access: sin restricciones de filesystem ni red\n• Se combina con --ask-for-approval para definir el nivel de autonomía completo de la sesión\n• Mismo valor que la clave sandbox_mode de config.toml, pero como override puntual de esa invocación"],
+    ["--ask-for-approval, -a", "Cuándo pide aprobación humana", "• untrusted: solo operaciones de lectura conocidas como seguras corren solas\n• on-request (default): Codex decide cuándo preguntar, según el riesgo de la acción\n• never: nunca pregunta, útil en pipelines no interactivos junto con --sandbox danger-full-access\n• Sustituye al antiguo flag --approval-mode, ya deprecado\n• Equivale a la clave approval_policy de config.toml pero solo para esa ejecución"],
+    ["--cd, -C", "Fija el directorio de trabajo", "• Arranca la sesión operando sobre esa carpeta en vez de la actual\n• Útil para lanzar Codex desde un script o atajo sin necesidad de cd previo\n• La jerarquía de AGENTS.md y la config de proyecto (.codex/config.toml) se resuelven desde esa carpeta, no desde el cwd real\n• Combinable con --profile o -c para separar por completo la configuración de cada proyecto"],
+    ["--image, -i", "Adjunta imágenes al prompt", "• Pasa archivos de imagen como parte del contexto inicial del prompt\n• Útil para compartir capturas de pantalla, mockups o diagramas que el modelo debe analizar\n• Acepta múltiples rutas de imagen en la misma invocación\n• Combinable con codex exec para pipelines no interactivos que procesan imágenes"],
+    ["--profile, -p", "Carga un perfil de configuración", "• Cada perfil es un ARCHIVO SEPARADO ($CODEX_HOME/nombre-perfil.config.toml), no una tabla dentro de config.toml\n• Agrupa modelo + sandbox + approval_policy distintos por contexto\n• Ejemplo típico: un perfil 'ci' de solo lectura para pipelines automatizados\n• Se selecciona con --profile nombre en cualquier invocación de codex"],
+    ["--oss", "Usa proveedores de modelo open-source locales", "• Cambia el backend de modelo a uno local/open-source en vez de la API de OpenAI\n• Pensado para trabajar sin conexión o sin depender de una cuenta/API key de OpenAI\n• Requiere tener configurado el model_provider open-source correspondiente en config.toml\n• Útil en entornos con restricciones de red o de cumplimiento que impiden llamar a la API externa"],
+    ["-c clave=valor", "Override puntual de config.toml", "• Sobrescribe cualquier clave de configuración solo para esa ejecución concreta\n• No persiste — la próxima invocación vuelve a leer el valor original del archivo\n• Se puede repetir -c varias veces para sobrescribir varias claves a la vez\n• Útil para probar un cambio de configuración antes de aplicarlo permanentemente al archivo"],
+    ["codex exec <prompt>", "Modo no interactivo para scripts/CI", "• Ejecuta sin terminal interactiva, pensado para scripts y CI\n• --json emite un stream JSON Lines de eventos (thread.started, turn.completed...)\n• -o/--output-last-message guarda el mensaje final en un archivo\n• --output-schema fuerza que la respuesta cumpla un JSON Schema\n• --skip-git-repo-check evita el requisito de estar en un repo git\n• Base de codex exec resume para encadenar pasos en un pipeline"],
+    ["codex exec resume --last <prompt>", "Continuar sesión previa sin interfaz", "• Retoma la última sesión, o una por SESSION_ID, de forma no interactiva\n• Permite encadenar pasos sucesivos de un pipeline sobre el mismo hilo de conversación\n• Hereda el contexto y el historial de la sesión original, no empieza de cero\n• Combinable con los mismos flags de codex exec (--json, -o, --output-schema...)"],
+    ["codex resume / codex fork", "Reabrir o bifurcar un chat reciente", "• resume reabre un chat reciente del repo actual, en modo interactivo\n• fork crea uno nuevo a partir de una sesión anterior sin tocar la original\n• fork es útil para explorar una rama de trabajo alternativa sin perder el hilo original\n• Ambos operan sobre las mismas sesiones que gestionan codex archive/unarchive/delete"],
+    ["codex archive / unarchive / delete", "Gestión del ciclo de vida de sesiones", "• archive oculta una sesión, que sigue siendo recuperable\n• unarchive la restaura a la lista principal\n• delete la borra permanentemente, sin vuelta atrás\n• Útil para mantener limpio el historial de codex resume sin perder sesiones importantes"],
+    ["codex review", "Revisión de código no interactiva", "• Ejecuta una revisión de código completa desde línea de comandos, sin abrir sesión interactiva\n• Pensado para integrarse en scripts o pipelines de CI que necesiten un veredicto de revisión\n• Comparable a lo que hace @codex review en un comentario de PR de GitHub, pero disparado localmente\n• No requiere que el proyecto tenga un environment de Codex Cloud configurado"],
+    ["codex sandbox", "Ejecutar un comando bajo sandbox puntual", "• Prueba cómo se comportaría un comando concreto bajo una política de sandbox dada\n• No arranca una sesión completa de agente, solo evalúa el comando aislado\n• Útil para depurar por qué un comando falla o queda bloqueado dentro de workspace-write o danger-full-access\n• Complementa a codex execpolicy check, que evalúa reglas en vez de comportamiento real de sandbox"],
+    ["codex mcp add/list/login/remove", "Gestionar servidores MCP desde CLI", "• add añade un servidor MCP nuevo sin editar config.toml a mano\n• list muestra los servidores MCP configurados actualmente\n• login inicia el flujo OAuth para servidores remotos que lo requieran\n• remove quita un servidor MCP de la configuración\n• Alternativa por CLI a editar directamente las tablas [mcp_servers.<nombre>] de config.toml"],
+    ["codex doctor", "Diagnóstico de la instalación", "• Comprueba protección de endpoint y posibles fallos de red/proxy\n• Verifica el estado de la app de escritorio de Codex\n• Comprueba la conectividad necesaria para recibir actualizaciones\n• Primer comando recomendado cuando algo no arranca o falla de forma poco clara"],
+    ["codex login / logout", "Gestión de autenticación", "• login inicia sesión con la cuenta de OpenAI/ChatGPT que usará Codex\n• logout cierra esa sesión y borra las credenciales locales\n• Alternativa interactiva a usar CODEX_API_KEY/CODEX_ACCESS_TOKEN para automatización\n• Necesario tras cambiar de cuenta o de plan (Plus/Pro/Business/Enterprise/Edu)"],
+    ["codex features", "Activa/desactiva feature flags", "• Activa o desactiva funcionalidades experimentales disponibles para tu cuenta\n• Permite probar capacidades aún no habilitadas por defecto\n• El conjunto de features disponibles depende del plan y de la cuenta conectada\n• Complementa a codex plugin para gestionar qué capacidades adicionales están activas"],
+    ["codex plugin", "Instala y gestiona plugins", "• Añade o quita plugins que extienden Codex con nuevas skills o conectores\n• Fuentes admitidas: shorthand de GitHub (owner/repo[@ref]), URLs Git o directorios locales\n• Los admins pueden distribuir, permitir o bloquear plugins por equipo desde el marketplace\n• Ejemplos típicos: integraciones con Slack, Figma, Notion, Gmail o Drive"],
+    ["codex completion [shell]", "Autocompletado de shell", "• Genera scripts de autocompletado para Bash, Zsh, Fish o PowerShell\n• Se instala normalmente cargando la salida del comando en el archivo de configuración del shell\n• Facilita descubrir subcomandos y flags sin consultar la ayuda cada vez\n• Hay que regenerarlo si Codex añade nuevos subcomandos y quieres que aparezcan en el autocompletado"],
+    ["codex execpolicy check", "Testear reglas de ejecución", "• Sintaxis: codex execpolicy check --pretty --rules <archivo> -- <comando>\n• Simula cómo se evaluaría un comando contra un archivo de reglas .rules antes de que ocurra de verdad\n• Permite depurar reglas Starlark (prefix_rule) sin arriesgarse a bloquear o permitir algo por error en producción\n• Relacionado directamente con la sección 'Reglas de ejecución (execpolicy)' de Sandboxing y aprobaciones"],
+    ["--dangerously-bypass-approvals-and-sandbox (--yolo)", "Sin sandbox ni aprobaciones", "• El modo más permisivo posible: sin sandbox ni aprobaciones de ningún tipo\n• Equivale a combinar --sandbox danger-full-access con --ask-for-approval never\n• Usar solo en entornos desechables (contenedores, VMs de prueba), nunca en una máquina con datos sensibles\n• El nombre --yolo es literal: no hay ninguna barrera de seguridad activa"],
+    ["--full-auto", "Flag antiguo, deprecado", "• Flag antiguo, ya deprecado\n• Sigue aceptándose por compatibilidad hacia atrás, pero imprime un aviso al usarlo\n• Sustitúyelo por la combinación explícita de --sandbox y --ask-for-approval\n• Mantenido solo para no romper scripts existentes que aún lo invocan"],
+    ["codex app-server", "Servidor local de Codex (experimental)", "• Levanta un servidor local (experimental) que expone Codex como servicio\n• Sustituye al ya deprecado codex mcp-server desde el 24/08/2026\n• Pensado para integraciones que necesitan hablar con Codex por API en vez de por CLI interactiva\n• Aún en fase experimental: su interfaz puede cambiar entre versiones"],
+  ]},
+  { cat: "config.toml y perfiles", icon: "⚙️", items: [
+    ["~/.codex/config.toml", "Ubicación y estructura del archivo de configuración", "Raíz configurable vía la variable de entorno CODEX_HOME. Claves top-level clave: model, model_provider, approval_policy, sandbox_mode, notify (comando externo invocado con JSON en cada notificación), [mcp_servers.<nombre>], [agents], [hooks], tui.theme."],
+    ["Perfiles ($CODEX_HOME/nombre.config.toml)", "Configuración agrupada por contexto", "Cada perfil es un ARCHIVO SEPARADO junto a config.toml (no una tabla dentro del mismo archivo), seleccionado con --profile nombre. Sirve para tener, por ejemplo, un perfil 'ci' con sandbox_mode read-only y approval_policy on-request."],
+    ["notify", "Hook de notificación externa", "Array tipo argv que invoca un programa externo (ej. notify-send) con un payload JSON en cada notificación de Codex; deshabilitado si no está definido."],
+    ["config-sample oficial", "Plantilla comentada de +1100 líneas", "Cubre selección de modelo, reasoning effort (minimal a xhigh), verbosidad, aprobación/sandbox, login, modos de web search (cached/indexed/live), MCP, proveedores de modelo (OpenAI, Ollama, Bedrock, custom), feature flags, temas/animaciones/keybindings, OpenTelemetry, hooks y sandbox específico de Windows."],
+    ["CODEX_HOME", "Variable de entorno raíz", "Dónde vive todo el estado de Codex: config, auth, logs, sesiones, skills."],
+    ["CODEX_API_KEY / CODEX_ACCESS_TOKEN", "Autenticación para automatización", "API key para procesos no interactivos, o token de ChatGPT/Codex para automatización de confianza (CI, scripts)."],
+    ["CODEX_NON_INTERACTIVE", "Saltar prompts del instalador", "1/true/yes evita cualquier pregunta interactiva del instalador, útil en scripts de aprovisionamiento."],
+    ["OPENAI_FEDERATION_RULE_ID / OPENAI_IDENTITY_TOKEN_FILE / OPENAI_WORKLOAD_IDENTITY_CONTEXT", "Identidad federada para auditoría", "Variables para escenarios de workload identity federation en entornos empresariales."],
+    ["CODEX_CA_CERTIFICATE / SSL_CERT_FILE", "Certificados en redes corporativas", "Bundle CA necesario cuando hay TLS interception corporativo (proxy que reemplaza certificados)."],
+  ]},
+  { cat: "AGENTS.md", icon: "📄", items: [
+    ["AGENTS.md — jerarquía y precedencia", "El equivalente de Codex a CLAUDE.md", "Codex lee AGENTS.md antes de trabajar. Jerarquía de 3 niveles: (1) global ~/.codex/AGENTS.override.md y luego ~/.codex/AGENTS.md, (2) desde la raíz del repo Git hacia el directorio actual comprobando override y base en cada nivel, (3) los archivos se concatenan de raíz hacia abajo — los más cercanos al directorio actual 'ganan' porque aparecen después en el texto final. Un .override.md siempre prevalece sobre el .md base del mismo nivel. Límite combinado: 32 KiB por defecto."],
+    ["## Code Review Rules", "Sección especial para revisión de GitHub", "Dentro de AGENTS.md, esta sección personaliza qué marca Codex como P0/P1 en revisiones automáticas de PR — en la raíz del repo para reglas globales, o en services/nombre/AGENTS.md para reglas de un servicio concreto."],
+    ["codex --ask-for-approval never <prompt>", "Verificar qué AGENTS.md están activos", "Pídele que resuma las instrucciones activas (ej. Summarize the current instructions) para confirmar qué guías se cargaron realmente y en qué orden, útil cuando hay varios AGENTS.md en distintos niveles de carpeta."],
+  ]},
+  { cat: "Sandboxing y aprobaciones", icon: "🔒", items: [
+    ["read-only", "Nivel de sandbox más restrictivo", "El agente puede inspeccionar archivos pero no editarlos ni ejecutar comandos sin aprobación explícita."],
+    ["workspace-write", "Nivel de sandbox por defecto local", "Puede leer, editar dentro del workspace y ejecutar comandos locales rutinarios dentro de ese límite — no puede salirse de la carpeta del proyecto."],
+    ["danger-full-access", "Sin restricciones de filesystem ni red", "Elimina las barreras de sandbox por completo. Solo recomendado cuando quieres acceso total de forma intencional."],
+    ["Implementación por plataforma", "Seatbelt, bubblewrap, sandbox nativo de Windows", "macOS usa el framework Seatbelt nativo (funciona de fábrica). Linux/WSL2 requiere instalar bubblewrap (bwrap); Codex avisa si falta o si no puede crear el namespace de usuario necesario. Windows usa su sandbox nativo vía PowerShell; dentro de WSL2 usa la implementación de Linux."],
+    ["untrusted / on-request / never", "Políticas de aprobación (approval_policy)", "untrusted: solo operaciones de lectura conocidas como seguras corren solas. on-request (default): Codex decide cuándo pedir aprobación — necesaria para editar fuera del workspace o acceder a red. never: no pregunta nunca."],
+    ["Auto-review (Smart Approvals)", "Un agente revisa las aprobaciones en tu lugar", "Con approvals_reviewer = 'auto_review', un agente Codex especializado revisa solicitudes de aprobación (shell con permisos escalados, red bloqueada, ediciones fuera del workspace, llamadas MCP con anotaciones de aprobación, acceso a dominios de Computer Use) usando un transcript compacto, sin ver el chain-of-thought privado. Tiene un 'circuit breaker': para el turno tras 3 denegaciones seguidas o 10 en las últimas 50 revisiones. /approve fuerza una acción denegada."],
+    ["Reglas de ejecución (execpolicy)", "Control fino de qué comandos se permiten", "Sistema basado en Starlark con archivos .rules (ej. ~/.codex/rules/default.rules) y la función prefix_rule(pattern=[...], decision='allow'|'prompt'|'forbidden', justification='...'). La decisión más restrictiva gana si coinciden varias reglas. Codex divide cadenas de shell (&&, ||, ;, |) en comandos individuales para evaluarlos por separado, evitando colar un comando peligroso junto a uno seguro."],
+  ]},
+  { cat: "MCP en Codex", icon: "🔌", items: [
+    ["codex mcp add", "Añadir servidor MCP desde CLI", "codex mcp add <nombre> --env VAR=VALOR -- <comando-stdio>, o con URL remota: codex mcp add nombre --url https://ejemplo.com/mcp."],
+    ["Scopes: global vs. proyecto", "Dónde vive la configuración MCP", "Global en ~/.codex/config.toml (todos los proyectos) vs. project-scoped en .codex/config.toml del repo (requiere que el proyecto esté marcado como 'trusted'). La app de ChatGPT, el CLI y la extensión IDE comparten esta config."],
+    ["Sintaxis STDIO", "Servidor MCP local por comando", "[mcp_servers.nombre] con command, args, env, env_vars, cwd, startup_timeout_sec, tool_timeout_sec, enabled, required."],
+    ["Sintaxis HTTP streamable", "Servidor MCP remoto por URL", "Claves url, auth, bearer_token_env_var, http_headers, env_http_headers."],
+    ["OAuth para MCP", "Autenticación de servidores remotos", "Soporta CIMD (Client ID Metadata Documents, automático), DCR (Dynamic Client Registration, fallback) y clientes pre-registrados vía [mcp_servers.x.oauth]. Callback personalizable con mcp_oauth_callback_port/url."],
+    ["Aprobación por herramienta MCP", "Control fino de qué tool se ejecuta sola", "default_tools_approval_mode por servidor (auto, prompt, writes, approve), más enabled_tools/disabled_tools, y overrides por tool individual en [mcp_servers.x.tools.nombre_tool]."],
+  ]},
+  { cat: "Codex Cloud", icon: "☁️", items: [
+    ["Codex Cloud", "Tareas en contenedores aislados en paralelo", "Ejecuta tareas de código en entornos cloud aislados, en chatgpt.com/codex, para delegar trabajo largo mientras sigues trabajando en local."],
+    ["3 modos de entorno", "Local, Worktree, Cloud", "Local trabaja en el directorio del proyecto actual; Worktree aísla los cambios en un git worktree; ambos corren en tu máquina. Solo Cloud ejecuta de forma remota, en un contenedor."],
+    ["Environments", "Configuración por repo para tareas cloud", "Controla qué instala y ejecuta Codex durante tareas cloud: dependencias, linters/formatters, variables de entorno. El contenedor viene con lenguajes preinstalados; se pueden añadir paquetes con setup scripts."],
+    ["Variables vs. secrets", "Duración distinta durante la tarea", "Las variables de entorno duran toda la tarea (setup + fase de agente). Los secrets están cifrados y solo disponibles durante los setup scripts — se retiran antes de que empiece la fase de agente, por seguridad."],
+    ["Disparadores de tareas cloud", "Desde dónde se puede lanzar una tarea", "Interfaz web de chat, PRs/issues de GitHub, merge requests/issues de GitLab (Beta), issues de Linear, y canales/hilos de Slack."],
+  ]},
+  { cat: "Integraciones (Codex)", icon: "🔗", items: [
+    ["Extensión VS Code", "Codex dentro del editor (publisher openai)", "Disponible en el Marketplace; funciona con VS Code, Cursor y Windsurf. Panel lateral de chat que lee archivos abiertos, aplica ediciones en 'Agent mode', ejecuta comandos de terminal y conecta con Codex Cloud para tareas largas. Soporte nativo en macOS/Linux; en Windows se recomienda un workspace WSL."],
+    ["GitHub — @codex en comentarios", "Revisión y tareas desde un PR", "@codex review reacciona con 👀 y publica revisión centrada en issues P0/P1; @codex security review hace una revisión de seguridad más profunda (research preview); @codex <lo que sea> arranca una tarea cloud con el PR como contexto. Toggle 'Automatic reviews' revisa cada PR nuevo sin pedirlo."],
+    ["Slack — @Codex", "Delegar tareas desde un canal", "Se instala como app de Slack; mencionar @Codex en un canal o hilo delega tareas o hace preguntas, referenciando automáticamente el hilo. Requiere plan Plus/Pro/Business/Enterprise/Edu, cuenta de GitHub conectada y al menos un environment configurado."],
+    ["Plugins / marketplace", "Extender Codex con skills y conectores", "Sistema de plugins (Slack, Figma, Notion, Gmail, Drive...) que los admins pueden distribuir/permitir/bloquear por equipo. Fuentes de marketplace: shorthand de GitHub (owner/repo[@ref]), URLs Git, o directorios locales."],
+  ]},
+  { cat: "Computer Use (Codex)", icon: "🖱️", items: [
+    ["Computer Use", "Controlar apps de escritorio con IA", "Permite que Codex/ChatGPT vea y opere interfaces gráficas en macOS o Windows, cuando la CLI o integraciones estructuradas no bastan. Disponible en ChatGPT Work y Codex, regiones soportadas limitadas."],
+    ["Activación", "Cómo habilitarlo", "En la app de escritorio de ChatGPT: modo Work o Codex → Plugins → Computer Use → instalar/activar el plugin → activar toggles de servidor y skill → 'Try now'."],
+    ["Permisos de sistema", "Requisitos por plataforma", "macOS necesita permisos de Grabación de Pantalla y Accesibilidad. En Windows, la app objetivo debe permanecer visible en el escritorio activo (no funciona en segundo plano)."],
+    ["Modelo de permisos", "Aprobación por app", "ChatGPT pide aprobación antes de usar cada app; se puede marcar 'Always allow' y gestionar la lista en Ajustes. En Windows, las apps se pueden pre-aprobar vía config.toml por identificador o nombre de ejecutable."],
+    ["Límites de seguridad", "Qué NO puede hacer", "No puede automatizar apps de terminal ni al propio ChatGPT, no puede autenticarse como administrador, no puede aprobar prompts de permisos de seguridad del sistema. Ediciones de archivos y comandos de shell siguen sujetos al sandbox normal."],
+    ["Record & Replay (solo macOS)", "Convertir una demo en skill reutilizable", "Graba una demostración manual de un flujo de trabajo y la convierte en una skill reutilizable, combinable con Computer Use, acciones de navegador o plugins conectados. Requiere Computer Use activo; excluido al lanzamiento en UE, Reino Unido y Suiza."],
+  ]},
+  { cat: "Hooks (Codex)", icon: "🪝", items: [
+    ["Eventos disponibles", "Por turno y por sesión", "Por turno: PreToolUse, PermissionRequest, PostToolUse, PreCompact, PostCompact, UserPromptSubmit, SubagentStop, Stop. Por sesión: SessionStart, SessionEnd, SubagentStart."],
+    ["Ubicación y esquema", "Dónde se configuran y cómo", "Por prioridad: ~/.codex/hooks.json o config.toml → <repo>/.codex/hooks.json o config.toml (solo si esa carpeta del proyecto está marcada 'trusted') → hooks empaquetados en plugins. Esquema: {hooks: {Evento: [{matcher, hooks: [{type: command|mcp_tool, command, timeout, statusMessage, async}]}]}}. Timeout por defecto 600s."],
+    ["Limitación importante", "Qué SÍ y qué NO observan", "Solo observan Bash/shell, apply_patch (ediciones de archivo), llamadas MCP y function tools locales (update_plan, spawn_agent). Herramientas 'hosted' como WebSearch no pasan por este path. Hooks nuevos o modificados quedan pendientes de aprobación (Codex registra su hash) hasta que se confían explícitamente."],
+  ]},
+  { cat: "Subagentes (Codex)", icon: "🤖", items: [
+    ["Invocación", "Cómo se lanzan", "Pidiéndoselo directamente a Codex ('spawn two agents', 'delegate this work in parallel') o vía instrucciones en AGENTS.md/skills. /agent cambia entre hilos de agente activos e inspecciona el hilo en curso."],
+    ["Agentes personalizados (TOML)", "Definición propia de un subagente", "Archivo TOML independiente en ~/.codex/agents/ (personal) o .codex/agents/ (proyecto). Obligatorios: name, description, developer_instructions. Opcionales: model, model_reasoning_effort (ultra/max/xhigh/high/medium/low), sandbox_mode, mcp_servers, skills.config."],
+    ["Config global [agents]", "Límites y valores por defecto", "En config.toml: agents.enabled (default true), agents.max_concurrent_threads_per_session, agents.default_subagent_model, agents.default_subagent_reasoning_effort."],
+  ]},
+  { cat: "Novedades 2026 (changelog oficial de Codex)", icon: "🆕", items: [
+    ["Site tools (WebMCP) + tareas por eventos", "2026-08-25", "ChatGPT Work/Codex pueden usar herramientas expuestas por un sitio web dentro del navegador integrado. Tareas programadas disparables desde eventos de Gmail, Slack y GitHub (filtrar Gmail por remitente/asunto, vigilar canales de Slack, reaccionar a reviews y merges de PRs)."],
+    ["codex mcp-server deprecado", "2026-08-24", "Sustituido por el nuevo app server (codex app-server)."],
+    ["/import desde Claude Code y Cursor", "2026-08-11", "Permite importar configuración y chats recientes de otros agentes de código a Codex."],
+    ["Record & Replay", "2026-06-18", "Función solo macOS para grabar un flujo de trabajo manual y convertirlo en skill reutilizable."],
+    ["Atajos Cmd/Ctrl+Enter", "2026-06-11", "Feedback de aprobación personalizado directamente con atajo de teclado."],
+    ["PR Chat + /goal en Codex Mobile", "2026-06-09", "Revisar PRs de GitHub preguntando a Codex sobre los cambios en contexto; gestión de objetivos también desde el móvil."],
+    ["/side <prompt>", "2026-06-02", "Inicia una conversación paralela con una pregunta inicial ya incluida, sin interrumpir el chat principal."],
+    ["Documentación de Auto-review", "2026-05-11", "Ciclo de vida del revisor automático, condiciones de disparo, comportamiento ante fallos, configuración local/gestionada."],
+    ["Automatic approval reviews", "2026-04-23", "Codex enruta prompts de aprobación elegibles a través de un agente revisor automático antes de ejecutarlos — la base de lo que luego se formaliza como Auto-review. GPT-5.5 pasa a ser el modelo recomendado por defecto para implementación, refactors, debugging y testing."],
+    ["Plugins con desarrollo local", "2026-03-25", "Los plugins soportan probarse en local antes de publicarse, vía skill @plugin-creator."],
+    ["Sync de ajustes IDE↔app", "2026-03-23", "La extensión de IDE sincroniza ajustes clave con la app de Codex."],
+    ["Búsqueda con selección de texto", "2026-03-19", "Cmd/Ctrl+F arranca la búsqueda en reviews/diffs con la selección de texto actual."],
+    ["Slash commands a medio prompt", "2026-03-18", "Nuevos comandos para cambiar modelo/reasoning; los slash commands ya funcionan en medio de un prompt a medio escribir."],
+    ["GPT-5.4 mini", "2026-03-17", "Disponible en la app de Codex, el CLI, la extensión IDE y Codex en la web."],
+  ]},
+];
+
+function renderSection(gridId, data, agentType) {
+  const grid = document.getElementById(gridId);
+  data.forEach((group, gi) => {
+    const catDiv = document.createElement('div');
+    catDiv.className = 'cmd-category';
+    catDiv.dataset.groupIndex = gi;
+
+    const h3 = document.createElement('h3');
+    h3.textContent = (group.icon ? group.icon + ' ' : '') + group.cat;
+    catDiv.appendChild(h3);
+
+    const cardGrid = document.createElement('div');
+    cardGrid.className = 'cmd-grid';
+
+    group.items.forEach(([cmd, desc, long]) => {
+      const card = document.createElement('div');
+      card.className = 'cmd-card';
+      card.dataset.search = (cmd + ' ' + desc + ' ' + (long || '') + ' ' + group.cat).toLowerCase();
+      card.tabIndex = 0;
+      card.setAttribute('role', 'button');
+
+      const nameEl = document.createElement('p');
+      nameEl.className = 'cmd-name';
+      const iconEl = document.createElement('span');
+      iconEl.className = 'cmd-icon';
+      iconEl.textContent = group.icon || '';
+      nameEl.appendChild(iconEl);
+      nameEl.appendChild(document.createTextNode(cmd));
+
+      const descEl = document.createElement('p');
+      descEl.className = 'cmd-desc';
+      descEl.textContent = desc;
+
+      card.appendChild(nameEl);
+      card.appendChild(descEl);
+      card.addEventListener('click', () => openModal(agentType, group.icon, group.cat, cmd, desc, long));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(agentType, group.icon, group.cat, cmd, desc, long); }
+      });
+      cardGrid.appendChild(card);
+    });
+
+    catDiv.appendChild(cardGrid);
+    grid.appendChild(catDiv);
+  });
+}
+
+function wireSearch(inputId, gridId, countId) {
+  const input = document.getElementById(inputId);
+  const grid = document.getElementById(gridId);
+  const countEl = document.getElementById(countId);
+  const totalCards = grid.querySelectorAll('.cmd-card').length;
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    let visible = 0;
+    grid.querySelectorAll('.cmd-category').forEach(catDiv => {
+      let catVisible = 0;
+      catDiv.querySelectorAll('.cmd-card').forEach(card => {
+        const match = !q || card.dataset.search.includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) { catVisible++; visible++; }
+      });
+      catDiv.style.display = catVisible ? '' : 'none';
+    });
+    countEl.textContent = q ? `${visible} de ${totalCards} coinciden con "${q}"` : `${totalCards} comandos`;
+  });
+  countEl.textContent = `${totalCards} comandos`;
+}
+
+const modalOverlay = document.getElementById('modal-overlay');
+const modalBadge = document.getElementById('modal-badge');
+const modalCat = document.getElementById('modal-cat');
+const modalName = document.getElementById('modal-name');
+const modalDesc = document.getElementById('modal-desc');
+
+function openModal(agentType, icon, cat, cmd, desc, long) {
+  modalBadge.className = 'modal-badge ' + agentType;
+  modalBadge.textContent = agentType === 'claude' ? 'Claude Code' : 'Codex';
+  modalCat.textContent = cat;
+  modalName.textContent = (icon ? icon + ' ' : '') + cmd;
+  modalDesc.textContent = long || desc;
+  modalOverlay.classList.add('open');
+}
+
+function closeModal() {
+  modalOverlay.classList.remove('open');
+}
+
+document.getElementById('modal-close').addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalOverlay.classList.contains('open')) closeModal(); });
+
+renderSection('grid-claude', claudeData, 'claude');
+renderSection('grid-codex', codexData, 'codex');
+wireSearch('search-claude', 'grid-claude', 'count-claude');
+wireSearch('search-codex', 'grid-codex', 'count-codex');
+</script>
+</body>
+</html>

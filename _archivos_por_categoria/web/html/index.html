@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skill Maestra — Tus herramientas</title>
+  <link rel="icon" href="data:," />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f4f6fa; color: #1e1e2e; line-height: 1.5; }
+
+    header {
+      background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+      color: white;
+      padding: 32px 40px;
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    }
+    header .logo { font-size: 2.5rem; }
+    header h1 { font-size: 1.8rem; font-weight: 700; }
+    header p  { font-size: 0.95rem; opacity: 0.75; margin-top: 4px; }
+    header .badge {
+      margin-left: auto;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .container { max-width: 1280px; margin: 0 auto; padding: 24px 18px 48px; }
+
+    .quickstart {
+      background: linear-gradient(135deg, #f7fbff 0%, #eef4ff 100%);
+      border: 1px solid #d7e4ff;
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin: 8px 0 24px;
+      box-shadow: 0 2px 12px rgba(15,52,96,0.06);
+    }
+
+    .http-banner {
+      margin: 18px 0 12px;
+      padding: 16px 18px;
+      border: 1px solid #f2d57d;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #fff8df 0%, #fff2cc 100%);
+      color: #5f4300;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: 0 4px 14px rgba(95, 67, 0, 0.08);
+    }
+    .http-banner strong { display: block; font-size: 0.98rem; margin-bottom: 4px; }
+    .http-banner p { font-size: 0.88rem; line-height: 1.45; }
+    .http-banner a { white-space: nowrap; }
+    .quickstart h2 {
+      font-size: 1.05rem;
+      color: #0f3460;
+      margin-bottom: 8px;
+    }
+    .quickstart p {
+      font-size: 0.92rem;
+      color: #42506a;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .quickstart code {
+      display: inline-block;
+      background: #0f3460;
+      color: white;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.84rem;
+      font-family: Consolas, monospace;
+    }
+
+    .stats {
+      display: flex; gap: 16px; margin-bottom: 40px; flex-wrap: wrap;
+    }
+    .stat {
+      background: white; border-radius: 12px; padding: 20px 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex; align-items: center; gap: 14px; flex: 1; min-width: 160px;
+      cursor: pointer; transition: box-shadow .15s, border .15s;
+      border: 2px solid transparent;
+    }
+    .stat:hover { box-shadow: 0 4px 16px rgba(15,52,96,0.15); border-color: #0f3460; }
+    .stat.active { border-color: #0f3460; background: #eef3fb; box-shadow: 0 4px 16px rgba(15,52,96,0.18); }
+    .stat .icon { font-size: 2rem; }
+    .stat .val  { font-size: 1.8rem; font-weight: 700; color: #0f3460; }
+    .stat .lbl  { font-size: 0.8rem; color: #666; }
+
+    @keyframes countUp {
+      from { opacity: 0.7; }
+      to { opacity: 1; }
+    }
+
+    .stat .val.counting {
+      animation: countUp 0.3s ease-out;
+    }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+
+    .card {
+      background: white; border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      overflow: hidden; transition: transform .2s, box-shadow .2s;
+      display: flex; flex-direction: column;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+
+    .card-header {
+      padding: 20px 24px 16px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .card-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .card-title { font-size: 1.05rem; font-weight: 700; color: #1e1e2e; }
+    .card-type  { font-size: 0.75rem; color: #888; margin-top: 3px; }
+
+    .card-body { padding: 0 24px 16px; flex: 1; }
+    .card-desc  { font-size: 0.875rem; color: #444; line-height: 1.55; }
+
+    .card-tags  { padding: 12px 24px; display: flex; flex-wrap: wrap; gap: 6px; border-top: 1px solid #f0f0f0; }
+    .tag {
+      background: #f0f4ff; color: #3a5bd9; border-radius: 20px;
+      padding: 3px 10px; font-size: 0.72rem; font-weight: 500;
+    }
+
+    .card-footer {
+      padding: 14px 24px; border-top: 1px solid #f0f0f0;
+      display: flex; gap: 10px;
+    }
+    .btn {
+      border: 1px solid #d8e1ec; border-radius: 8px; padding: 8px 14px;
+      font-size: 0.8rem; font-weight: 600; cursor: pointer;
+      transition: background .15s, transform .15s; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary { background: #0f3460; color: white; }
+    .btn-primary:hover { background: #1a4a80; }
+    .btn-ghost { background: #f4f6fa; color: #444; }
+    .btn-ghost:hover { background: #e8ecf4; }
+
+    /* colores por skill */
+    .c-blue   { background: #dbeafe; color: #1d4ed8; }
+    .c-green  { background: #dcfce7; color: #16a34a; }
+    .c-purple { background: #ede9fe; color: #7c3aed; }
+    .c-orange { background: #ffedd5; color: #ea580c; }
+    .c-pink   { background: #fce7f3; color: #be185d; }
+    .c-teal   { background: #ccfbf1; color: #0f766e; }
+    .c-yellow { background: #fef9c3; color: #a16207; }
+    .c-red    { background: #fee2e2; color: #dc2626; }
+    .c-gray   { background: #f1f5f9; color: #475569; }
+
+    footer {
+      text-align: center; padding: 32px; color: #aaa; font-size: 0.8rem;
+      border-top: 1px solid #e8ecf4; margin-top: 48px;
+    }
+
+    .auto-index code { background: #0f3460; color: white; border-radius: 8px; padding: 4px 8px; }
+    .auto-summary { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .auto-badge { display: inline-flex; background: #e8eef7; color: #0f3460; border-radius: 999px; padding: 5px 10px; font-size: .78rem; font-weight: 700; }
+    .auto-badge-link { border: 0; cursor: pointer; transition: transform .15s, box-shadow .15s, background .15s; }
+    .auto-badge-link:hover { transform: translateY(-1px); background: #dbe7fb; box-shadow: 0 4px 12px rgba(15,52,96,0.12); }
+    .auto-panel { background: white; border: 1px solid #dce5f2; border-radius: 12px; padding: 20px; margin: 24px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .auto-panel h2 { color: #0f3460; margin-bottom: 12px; font-size: 1.25rem; }
+    .auto-muted { color: #667085; font-size: .82rem; line-height: 1.45; }
+    .auto-table-wrap { overflow-x: auto; }
+    .auto-table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+    .auto-table th, .auto-table td { text-align: left; border-top: 1px solid #edf1f7; padding: 10px 8px; vertical-align: top; }
+    .auto-table th { color: #0f3460; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+    @media (max-width: 760px) {
+      header { padding: 28px 20px; align-items: flex-start; }
+      header .badge { margin-left: 0; max-width: 100%; overflow-wrap: anywhere; }
+      header h1 { font-size: 1.75rem; }
+      .card-footer { flex-wrap: wrap; }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /* AUTO-INDEX-SKILL-MAESTRA-CSS:START */
+    .container > .stats, .container > .grid { display: none; }
+    .auto-hero { background: #ffffff; border: 1px solid #d7e4ff; border-radius: 14px; padding: 24px; margin-bottom: 18px; box-shadow: 0 8px 24px rgba(15,52,96,0.08); display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 430px); gap: 22px; align-items: start; }
+    .auto-hero h2 { font-size: 1.7rem; color: #0f3460; margin-bottom: 8px; }
+    .auto-hero p { color: #45546b; line-height: 1.55; }
+    .auto-eyebrow { color: #7a4d00 !important; font-size: .78rem !important; text-transform: uppercase; font-weight: 800; letter-spacing: .06em; margin-bottom: 6px !important; }
+    .auto-summary { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; min-width: 0; margin-top: 14px; }
+    .auto-badge { display: inline-flex; align-items: center; background: #e8eef7; color: #0f3460; border-radius: 999px; padding: 5px 10px; font-size: .78rem; font-weight: 700; max-width: 100%; white-space: normal; }
+    .auto-badge-link { border: 0; cursor: pointer; font-family: inherit; transition: transform .15s, box-shadow .15s, background .15s; }
+    .auto-badge-link:hover { transform: translateY(-1px); background: #dbe7fb; box-shadow: 0 4px 12px rgba(15,52,96,0.12); }
+    .portal-menu { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 18px 0 22px; }
+    .portal-card { min-height: 138px; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 10px; border: 1px solid #dce5f2; border-radius: 14px; padding: 18px; background: #fff; color: #18253b; text-align: left; box-shadow: 0 4px 16px rgba(15,52,96,0.07); }
+    .portal-card:hover, .portal-card.active { background: #eef5ff; border-color: #0f3460; box-shadow: 0 10px 26px rgba(15,52,96,0.14); }
+    .portal-card strong { font-size: 1.15rem; color: #0f3460; }
+    .portal-card em { color: #59677c; font-style: normal; font-size: .86rem; line-height: 1.35; }
+    .portal-icon { width: 44px; height: 44px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; background: #0f3460; color: #fff; position: relative; overflow: hidden; }
+    .portal-icon::before, .portal-icon::after, .auto-icon::before, .auto-icon::after { content: ""; position: absolute; display: block; }
+    .portal-icon-instructions::before { width: 20px; height: 24px; border: 2px solid #fff; border-radius: 3px; background: transparent; }
+    .portal-icon-instructions::after { width: 12px; height: 2px; background: #fff; box-shadow: 0 6px 0 #fff, 0 12px 0 #fff; left: 16px; top: 13px; }
+    .portal-icon-skills::before { width: 7px; height: 7px; border-radius: 50%; background: #fff; box-shadow: 12px 0 0 #fff, 6px 10px 0 #fff, 18px 10px 0 #fff; left: 10px; top: 11px; }
+    .portal-icon-skills::after { width: 22px; height: 2px; background: #fff; transform: rotate(27deg); left: 11px; top: 22px; box-shadow: 0 9px 0 #fff; }
+    .portal-icon-extensions::before { width: 20px; height: 17px; border: 2px solid #fff; border-radius: 4px; left: 10px; top: 15px; }
+    .portal-icon-extensions::after { width: 3px; height: 10px; background: #fff; left: 17px; top: 8px; box-shadow: 8px 0 0 #fff; }
+    .portal-icon-scripts::before { width: 18px; height: 22px; border: 2px solid #fff; border-radius: 4px; left: 13px; top: 11px; }
+    .portal-icon-scripts::after { width: 10px; height: 2px; background: #fff; left: 17px; top: 16px; box-shadow: 0 5px 0 #fff, 0 10px 0 #fff; }
+    .portal-icon-functions::before { width: 18px; height: 18px; border: 2px solid #fff; border-radius: 6px; left: 13px; top: 13px; }
+    .portal-icon-functions::after { width: 12px; height: 12px; border-right: 2px solid #fff; border-bottom: 2px solid #fff; transform: rotate(-45deg); left: 16px; top: 15px; }
+    .portal-icon-commands::before { width: 3px; height: 3px; border-radius: 50%; background: #fff; left: 15px; top: 21px; box-shadow: 8px 0 0 #fff, 16px 0 0 #fff; }
+    .portal-icon-commands::after { content: "/"; position: absolute; left: 16px; top: 6px; font-size: 20px; font-weight: 800; color: #fff; background: none; }
+    .portal-panel { display: block; background: white; border: 1px solid #dce5f2; border-radius: 14px; padding: 22px; margin: 20px 0 28px; box-shadow: 0 6px 22px rgba(15,52,96,0.07); scroll-margin-top: 20px; }
+    .auto-panel-head { display: flex; justify-content: space-between; gap: 14px; align-items: center; margin-bottom: 18px; }
+    .auto-panel-head h2 { color: #0f3460; font-size: 1.35rem; margin: 0; }
+    .skill-panel-actions { display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+    .auto-search { width: min(100%, 360px); border: 1px solid #cfd8e6; border-radius: 8px; padding: 9px 11px; font: inherit; font-size: .86rem; color: #18253b; background: #fff; }
+    .auto-search:focus { outline: 3px solid #bfdbfe; border-color: #2563eb; }
+    .auto-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(275px, 1fr)); gap: 14px; }
+    .instructions-grid { grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); }
+    .auto-card { border: 1px solid #e3e9f3; border-radius: 12px; padding: 16px; min-height: 210px; display: flex; flex-direction: column; gap: 12px; background: #fbfcff; }
+    .auto-card.instruction { background: #fffdf7; border-color: #f1dfae; }
+    .auto-card-head { display: flex; gap: 12px; align-items: flex-start; }
+    .auto-card h3 { margin: 0 0 4px; font-size: .98rem; color: #18253b; }
+    .auto-card span:not(.auto-icon) { color: #69758a; font-size: .76rem; }
+    .auto-card p { color: #3b4658; font-size: .86rem; line-height: 1.45; }
+    .auto-icon { width: 34px; height: 34px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; color: #0f3460; background: #e8eef7; flex: 0 0 auto; position: relative; }
+    .auto-icon-instruction::before { width: 15px; height: 18px; border: 2px solid #0f3460; border-radius: 3px; left: 8px; top: 7px; }
+    .auto-icon-instruction::after { width: 9px; height: 2px; background: #0f3460; left: 12px; top: 12px; box-shadow: 0 5px 0 #0f3460, 0 10px 0 #0f3460; }
+    .auto-icon-skill::before { width: 6px; height: 6px; border-radius: 50%; background: #0f3460; left: 8px; top: 8px; box-shadow: 10px 0 0 #0f3460, 5px 9px 0 #0f3460, 15px 9px 0 #0f3460; }
+    .auto-icon-skill::after { width: 18px; height: 2px; background: #0f3460; transform: rotate(27deg); left: 8px; top: 18px; box-shadow: 0 8px 0 #0f3460; }
+    .auto-icon-scripts::before { width: 14px; height: 18px; border: 2px solid #0f3460; border-radius: 4px; left: 9px; top: 7px; }
+    .auto-icon-scripts::after { width: 8px; height: 2px; background: #0f3460; left: 13px; top: 12px; box-shadow: 0 5px 0 #0f3460, 0 10px 0 #0f3460; }
+    .auto-icon-function::before { width: 14px; height: 14px; border: 2px solid #0f3460; border-radius: 5px; left: 9px; top: 9px; }
+    .auto-icon-function::after { width: 9px; height: 9px; border-right: 2px solid #0f3460; border-bottom: 2px solid #0f3460; transform: rotate(-45deg); left: 12px; top: 11px; }
+    .auto-path { margin-top: auto; background: #edf2f8; border-radius: 7px; padding: 8px; color: #59677c; font-family: Consolas, monospace; font-size: .72rem; overflow-wrap: anywhere; }
+    .extension-callout { border-radius: 12px; background: #fff8df; border: 1px solid #f2d57d; padding: 18px; color: #5f4300; }
+    .extension-callout p { margin-top: 8px; color: #6b5a25; }
+    .auto-muted { color: #667085; font-size: .82rem; line-height: 1.45; }
+    .ops-panel { display: grid; grid-template-columns: 1fr; gap: 16px; margin: 0 0 24px; }
+    .ops-card { background: #fff; border: 1px solid #dce5f2; border-radius: 14px; box-shadow: 0 6px 22px rgba(15,52,96,0.07); padding: 18px; }
+    .ops-card h3 { font-size: 1rem; color: #0f3460; margin-bottom: 6px; }
+    .ops-kpis { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-top: 14px; }
+    .ops-kpi { border: 1px solid #e5ebf5; border-radius: 12px; padding: 12px; background: #fbfcff; min-height: 88px; }
+    button.ops-kpi { text-align: left; font: inherit; cursor: pointer; }
+    .ops-kpi-link, .ops-item-link, .ops-mini-link { cursor: pointer; transition: transform .15s, box-shadow .15s, border-color .15s, background .15s; }
+    .ops-kpi-link:hover, .ops-item-link:hover, .ops-mini-link:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(15,52,96,0.10); border-color: #b9cae4; background: #f7faff; }
+    .ops-kpi-link:focus-visible, .ops-item-link:focus-visible, .ops-mini-link:focus-visible, .auto-badge-link:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+    .ops-kpi-alert { background: #fff1f2; border-color: #fecdd3; }
+    .ops-kpi-detail { grid-column: span 2; }
+    .ops-kpi .ops-list { margin-top: 10px; }
+    .ops-kpi .ops-empty { padding: 10px 12px; font-size: .92rem; }
+    .ops-kpi-label { color: #667085; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; font-weight: 800; }
+    .ops-kpi-value { font-size: 1.5rem; font-weight: 800; color: #18253b; }
+    .ops-kpi-sub { color: #667085; font-size: .78rem; margin-top: 6px; overflow-wrap: anywhere; }
+    .ops-kpi-sub strong { color: #0f3460; font-weight: 800; }
+    .ops-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+    .ops-item { border: 1px solid #e5ebf5; border-radius: 12px; padding: 12px; background: #fbfcff; }
+    .ops-item-alert { background: #fff1f2; border-color: #fecdd3; }
+    .ops-item-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; margin-bottom: 6px; }
+    .ops-item-title { font-weight: 700; color: #18253b; }
+    .ops-item-meta { color: #667085; font-size: .8rem; }
+    .ops-item-pill { border-radius: 999px; padding: 3px 8px; font-size: .73rem; font-weight: 700; white-space: nowrap; }
+    .pill-bad { background: #fee2e2; color: #991b1b; }
+    .ops-note { color: #475467; font-size: .84rem; line-height: 1.5; margin-top: 8px; }
+    .ops-empty { border: 1px dashed #cbd5e1; border-radius: 12px; padding: 14px; color: #667085; background: #f8fafc; font-size: .84rem; }
+    @media (max-width: 900px) { .auto-hero { grid-template-columns: 1fr; } .auto-summary { justify-content: flex-start; } }
+    @media (max-width: 980px) { .ops-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); } .ops-kpi-detail { grid-column: span 2; } }
+    @media (max-width: 760px) { .portal-menu { grid-template-columns: 1fr; } .auto-panel-head { align-items: flex-start; flex-direction: column; } .skill-panel-actions, .auto-search { width: 100%; justify-content: flex-start; } .ops-kpis { grid-template-columns: 1fr; } .ops-kpi-detail { grid-column: span 1; } }
+    /* AUTO-INDEX-SKILL-MAESTRA-CSS:END */</style>
+  <link rel="stylesheet" href="./skill-catalog.css" />
+</head>
+<body>
+
+<header>
+  <div class="logo">⚡</div>
+  <div>
+    <h1>Skill Maestra</h1>
+    <p>Tus herramientas, explicadas para usarlas</p>
+  </div>
+  <div class="badge">Actualizado: 2026-10-11 11:22:30</div>
+</header>
+
+<div class="container">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- AUTO-INDEX-SKILL-MAESTRA:START -->
+  <section id="inventario-vivo" class="catalog-intro">
+    <h2>Qué tienes y qué puedes hacer</h2>
+    <p>Encuentra una herramienta, entiende para qué sirve y aprende a usarla. Tus <strong>14 skills</strong> están reunidas aquí, sin contar dos veces las copias del proyecto. <strong>8</strong> están escritas o adaptadas a mano por el equipo Skill Maestra (marcadas con &#9733; <strong>Propia de Skill Maestra</strong>) y <strong>6</strong> son paquetes de terceros (Azure, Google Workspace, HyperFrames, recetas, personas...).</p>
+  </section>
+
+  <nav class="catalog-tabs" aria-label="Tipos de herramientas">
+    <button type="button" data-panel="panel-skills" aria-controls="panel-skills" aria-pressed="true" class="active">Skills (14)</button>
+    <button type="button" class="tab-origin-shortcut" onclick="showOnlyOrigin('propia')" title="Ver solo las skills escritas o adaptadas a mano por el equipo Skill Maestra">&#9733; Solo propias (8)</button>
+    <button type="button" data-panel="panel-instructions" aria-controls="panel-instructions" aria-pressed="false">Tus instrucciones (5)</button>
+    <button type="button" data-panel="panel-scripts" aria-controls="panel-scripts" aria-pressed="false">Scripts</button>
+    <button type="button" data-panel="panel-extensions" aria-controls="panel-extensions" aria-pressed="false">Extensiones</button>
+    <a href="./comandos.html">Comandos del chat</a>
+    <a href="./trucos.html">Trucos</a>
+    <a href="./hyperframes.html">HyperFrames</a>
+  </nav>
+
+  <section id="panel-skills" class="portal-panel">
+    <div class="auto-panel-head"><div><h2>Qué puedes pedirle a la IA</h2>
+      <p class="catalog-explanation">Una skill es una guía que enseña al agente a hacer una tarea. Copia un ejemplo, pégalo en tu chat y añade tus datos. El agente utiliza las herramientas y conexiones disponibles en esa sesión.</p>
+    </div></div>
+    <div class="catalog-toolbar">
+      <div class="catalog-fields">
+        <label>¿Qué necesitas hacer?<input id="skill-search" type="search" placeholder="Por ejemplo: PDF, flujos, correo, web…" /></label>
+        <label>Tema<select id="skill-category"><option value="">Todos los temas</option><option value="C&#243;digo, pruebas y seguridad">C&#243;digo, pruebas y seguridad (5)</option><option value="Documentos y dise&#241;o">Documentos y dise&#241;o (2)</option><option value="Organizar el trabajo de la IA">Organizar el trabajo de la IA (4)</option><option value="Power Platform">Power Platform (3)</option></select></label>
+        <label>Origen<select id="skill-origin-filter"><option value="">Propias y de terceros</option><option value="propia">Solo propias de Skill Maestra (8)</option><option value="terceros">Solo paquetes de terceros (6)</option></select></label>
+        <label>Paquete<select id="skill-package-filter"><option value="">Todos los paquetes</option><option value="propia">Propia de Skill Maestra (8)</option><option value="openai-skills">Skills de OpenAI (4)</option><option value="anthropics-skills">Skills de Anthropic (2)</option></select></label>
+        <label>Disponibilidad<select id="skill-scope"><option value="">Todas las skills</option><option value="project">Con copia en este proyecto</option><option value="global">Solo en la carpeta global</option></select></label>
+      </div>
+      <div class="catalog-examples"><span>Prueba con:</span><button type="button" data-search-example="PDF">Documentos PDF</button><button type="button" data-search-example="flujos">Flujos de Power Automate</button><button type="button" data-search-example="web">Crear una web</button><button type="button" data-search-example="correo">Correo</button></div>
+    </div>
+    <div id="skill-results-start" class="catalog-results" tabindex="-1"><p id="skill-search-count" role="status" aria-live="polite">14 skills en 14 fichas.</p><button type="button" class="btn btn-ghost" data-reset-skills>Limpiar filtros</button></div>
+    <div class="auto-card-grid">      <article class="auto-card" data-skill-name="code-app" data-skill-scope="project" data-skill-origin="propia" data-skill-package="propia" data-skill-category="Power Platform" data-skill-search="Crear aplicaciones con c&#243;digo en Power Apps Construye y despliega Code Apps con conexiones, planificaci&#243;n y validaci&#243;n de la aplicaci&#243;n. Usa la skill code-app para crear aplicaciones con c&#243;digo en Power Apps. Te indicar&#233; los archivos o datos con los que trabajar. code-app Power Platform Crea, extiende y despliega Power Apps Code Apps siguiendo el estandar del plugin oficial code-apps: connector-first, planning policy, memory-bank y build/deploy con npx power-apps. WHEN: Code App, Code Apps, code app, create-code-app, add datasource, add connector, dataverse code app, deploy code app, power-apps push. Propia de Skill Maestra ">
+        <div class="skill-card-head">
+          <span class="skill-topic">Power Platform</span>
+          <span class="skill-origin-badge origin-propia" title="Escrita o adaptada a mano por el equipo Skill Maestra">&#9733; Propia de Skill Maestra</span>
+        </div>
+        <h3>Crear aplicaciones con c&#243;digo en Power Apps</h3>
+        <p class="skill-slug"><code>code-app</code></p>
+        <p>Construye y despliega Code Apps con conexiones, planificaci&#243;n y validaci&#243;n de la aplicaci&#243;n.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill code-app para crear aplicaciones con c&#243;digo en Power Apps. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>code-app</code></p>
+          <p><strong>Origen:</strong> Propia de Skill Maestra</p>
+          <p><strong>Descripción de origen:</strong> Crea, extiende y despliega Power Apps Code Apps siguiendo el estandar del plugin oficial code-apps: connector-first, planning policy, memory-bank y build/deploy con npx power-apps. WHEN: Code App, Code Apps, code app, create-code-app, add datasource, add connector, dataverse code app, deploy code app, power-apps push.</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/code-app/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="model-driven-apps" data-skill-scope="project" data-skill-origin="propia" data-skill-package="propia" data-skill-category="Power Platform" data-skill-search="Crear p&#225;ginas para aplicaciones de Dataverse Construye y despliega p&#225;ginas generativas dentro de aplicaciones basadas en modelos. Usa la skill model-driven-apps para crear p&#225;ginas para aplicaciones de Dataverse. Te indicar&#233; los archivos o datos con los que trabajar. model-driven-apps Power Platform Crea, actualiza y despliega paginas generativas (genpage/genux) para aplicaciones model-driven siguiendo el estandar del plugin oficial model-apps: prerequisitos PAC CLI, plan confirmado, generacion de schema, codigo React 17 + TypeScript + Fluent UI V9, despliegue y verificacion. WHEN: Model Driven Apps, Model-Driven Apps, model driven... Propia de Skill Maestra ">
+        <div class="skill-card-head">
+          <span class="skill-topic">Power Platform</span>
+          <span class="skill-origin-badge origin-propia" title="Escrita o adaptada a mano por el equipo Skill Maestra">&#9733; Propia de Skill Maestra</span>
+        </div>
+        <h3>Crear p&#225;ginas para aplicaciones de Dataverse</h3>
+        <p class="skill-slug"><code>model-driven-apps</code></p>
+        <p>Construye y despliega p&#225;ginas generativas dentro de aplicaciones basadas en modelos.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill model-driven-apps para crear p&#225;ginas para aplicaciones de Dataverse. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>model-driven-apps</code></p>
+          <p><strong>Origen:</strong> Propia de Skill Maestra</p>
+          <p><strong>Descripción de origen:</strong> Crea, actualiza y despliega paginas generativas (genpage/genux) para aplicaciones model-driven siguiendo el estandar del plugin oficial model-apps: prerequisitos PAC CLI, plan confirmado, generacion de schema, codigo React 17 + TypeScript + Fluent UI V9, despliegue y verificacion. WHEN: Model Driven Apps, Model-Driven Apps, model driven...</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/model-driven-apps/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="power-bi-modeling-mcp-server" data-skill-scope="project" data-skill-origin="propia" data-skill-package="propia" data-skill-category="Power Platform" data-skill-search="Configurar la edici&#243;n de modelos de Power BI Instala y utiliza herramientas para trabajar con el modelo sem&#225;ntico de Power BI desde el agente. Usa la skill power-bi-modeling-mcp-server para configurar la edici&#243;n de modelos de Power BI. Te indicar&#233; los archivos o datos con los que trabajar. power-bi-modeling-mcp-server Power Platform Instala, configura y usa la extension oficial Power BI Modeling MCP Server de Microsoft para exponer capacidades de modelado semantico de Power BI a GitHub Copilot en VS Code. Usar cuando necesites conectarte a Power BI Desktop, Fabric o proyectos PBIP/TMDL, listar y modificar tablas, columnas, medidas, relaciones, particiones, roles o e... Propia de Skill Maestra ">
+        <div class="skill-card-head">
+          <span class="skill-topic">Power Platform</span>
+          <span class="skill-origin-badge origin-propia" title="Escrita o adaptada a mano por el equipo Skill Maestra">&#9733; Propia de Skill Maestra</span>
+        </div>
+        <h3>Configurar la edici&#243;n de modelos de Power BI</h3>
+        <p class="skill-slug"><code>power-bi-modeling-mcp-server</code></p>
+        <p>Instala y utiliza herramientas para trabajar con el modelo sem&#225;ntico de Power BI desde el agente.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill power-bi-modeling-mcp-server para configurar la edici&#243;n de modelos de Power BI. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>power-bi-modeling-mcp-server</code></p>
+          <p><strong>Origen:</strong> Propia de Skill Maestra</p>
+          <p><strong>Descripción de origen:</strong> Instala, configura y usa la extension oficial Power BI Modeling MCP Server de Microsoft para exponer capacidades de modelado semantico de Power BI a GitHub Copilot en VS Code. Usar cuando necesites conectarte a Power BI Desktop, Fabric o proyectos PBIP/TMDL, listar y modificar tablas, columnas, medidas, relaciones, particiones, roles o e...</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/power-bi-modeling-mcp-server/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="design-md" data-skill-scope="project" data-skill-origin="propia" data-skill-package="propia" data-skill-category="Documentos y dise&#241;o" data-skill-search="Definir el estilo visual de una aplicaci&#243;n Documenta colores, tipograf&#237;a y componentes para que la IA mantenga un dise&#241;o coherente. Usa la skill design-md para definir el estilo visual de una aplicaci&#243;n. Te indicar&#233; los archivos o datos con los que trabajar. design-md Documentos y dise&#241;o Define y valida un archivo DESIGN.md para guiar a agentes de IA en la generacion de interfaces coherentes con tu sistema visual: colores, tipografia, spacing, componentes, reglas visuales y estilo UI. Usar cuando pidas crear, revisar, mejorar o lintar un DESIGN.md para UI. Propia de Skill Maestra ">
+        <div class="skill-card-head">
+          <span class="skill-topic">Documentos y dise&#241;o</span>
+          <span class="skill-origin-badge origin-propia" title="Escrita o adaptada a mano por el equipo Skill Maestra">&#9733; Propia de Skill Maestra</span>
+        </div>
+        <h3>Definir el estilo visual de una aplicaci&#243;n</h3>
+        <p class="skill-slug"><code>design-md</code></p>
+        <p>Documenta colores, tipograf&#237;a y componentes para que la IA mantenga un dise&#241;o coherente.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill design-md para definir el estilo visual de una aplicaci&#243;n. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>design-md</code></p>
+          <p><strong>Origen:</strong> Propia de Skill Maestra</p>
+          <p><strong>Descripción de origen:</strong> Define y valida un archivo DESIGN.md para guiar a agentes de IA en la generacion de interfaces coherentes con tu sistema visual: colores, tipografia, spacing, componentes, reglas visuales y estilo UI. Usar cuando pidas crear, revisar, mejorar o lintar un DESIGN.md para UI.</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/design-md/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="frontend-design" data-skill-scope="project" data-skill-origin="terceros" data-skill-package="anthropics-skills" data-skill-category="Documentos y dise&#241;o" data-skill-search="Dise&#241;ar una web clara y cuidada Define la presentaci&#243;n visual y construye interfaces con tipograf&#237;a, distribuci&#243;n y estilo coherentes. Usa la skill frontend-design para dise&#241;ar una web clara, f&#225;cil de usar y adaptada al m&#243;vil. frontend-design Documentos y dise&#241;o Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don&#39;t read as templated defaults. Skills de Anthropic anthropics/skills">
+        <div class="skill-card-head">
+          <span class="skill-topic">Documentos y dise&#241;o</span>
+          <span class="skill-origin-badge origin-terceros" title="Paquete de terceros &#183; repositorio anthropics/skills">Skills de Anthropic</span>
+        </div>
+        <h3>Dise&#241;ar una web clara y cuidada</h3>
+        <p class="skill-slug"><code>frontend-design</code></p>
+        <p>Define la presentaci&#243;n visual y construye interfaces con tipograf&#237;a, distribuci&#243;n y estilo coherentes.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill frontend-design para dise&#241;ar una web clara, f&#225;cil de usar y adaptada al m&#243;vil.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>frontend-design</code></p>
+          <p><strong>Origen:</strong> Skills de Anthropic · repositorio <a href="https://github.com/anthropics/skills" target="_blank" rel="noopener noreferrer">anthropics/skills</a></p>
+          <p><strong>Descripción de origen:</strong> Guidance for distinctive, intentional visual design when building new UI or reshaping an existing one. Helps with aesthetic direction, typography, and making choices that don&#39;t read as templated defaults.</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/frontend-design/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="gh-address-comments" data-skill-scope="project" data-skill-origin="terceros" data-skill-package="openai-skills" data-skill-category="C&#243;digo, pruebas y seguridad" data-skill-search="Atender comentarios de una revisi&#243;n en GitHub Consulta los comentarios de una propuesta de cambios y ayuda a resolverlos. Usa la skill gh-address-comments para atender comentarios de una revisi&#243;n en GitHub. Te indicar&#233; los archivos o datos con los que trabajar. gh-address-comments C&#243;digo, pruebas y seguridad Help address review/issue comments on the open GitHub PR for the current branch using gh CLI; verify gh auth first and prompt the user to authenticate if not logged in. Skills de OpenAI openai/skills">
+        <div class="skill-card-head">
+          <span class="skill-topic">C&#243;digo, pruebas y seguridad</span>
+          <span class="skill-origin-badge origin-terceros" title="Paquete de terceros &#183; repositorio openai/skills">Skills de OpenAI</span>
+        </div>
+        <h3>Atender comentarios de una revisi&#243;n en GitHub</h3>
+        <p class="skill-slug"><code>gh-address-comments</code></p>
+        <p>Consulta los comentarios de una propuesta de cambios y ayuda a resolverlos.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill gh-address-comments para atender comentarios de una revisi&#243;n en GitHub. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>gh-address-comments</code></p>
+          <p><strong>Origen:</strong> Skills de OpenAI · repositorio <a href="https://github.com/openai/skills" target="_blank" rel="noopener noreferrer">openai/skills</a></p>
+          <p><strong>Descripción de origen:</strong> Help address review/issue comments on the open GitHub PR for the current branch using gh CLI; verify gh auth first and prompt the user to authenticate if not logged in.</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/gh-address-comments/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="gh-fix-ci" data-skill-scope="project" data-skill-origin="terceros" data-skill-package="openai-skills" data-skill-category="C&#243;digo, pruebas y seguridad" data-skill-search="Arreglar comprobaciones fallidas de GitHub Investiga errores de GitHub Actions y prepara las correcciones necesarias. Usa la skill gh-fix-ci para arreglar comprobaciones fallidas de GitHub. Te indicar&#233; los archivos o datos con los que trabajar. gh-fix-ci C&#243;digo, pruebas y seguridad Use when a user asks to debug or fix failing GitHub PR checks that run in GitHub Actions; use `gh` to inspect checks and logs, summarize failure context, draft a fix plan, and implement only after explicit approval. Treat external providers (for example Buildkite) as out of scope and report only the details URL. Skills de OpenAI openai/skills">
+        <div class="skill-card-head">
+          <span class="skill-topic">C&#243;digo, pruebas y seguridad</span>
+          <span class="skill-origin-badge origin-terceros" title="Paquete de terceros &#183; repositorio openai/skills">Skills de OpenAI</span>
+        </div>
+        <h3>Arreglar comprobaciones fallidas de GitHub</h3>
+        <p class="skill-slug"><code>gh-fix-ci</code></p>
+        <p>Investiga errores de GitHub Actions y prepara las correcciones necesarias.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill gh-fix-ci para arreglar comprobaciones fallidas de GitHub. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>gh-fix-ci</code></p>
+          <p><strong>Origen:</strong> Skills de OpenAI · repositorio <a href="https://github.com/openai/skills" target="_blank" rel="noopener noreferrer">openai/skills</a></p>
+          <p><strong>Descripción de origen:</strong> Use when a user asks to debug or fix failing GitHub PR checks that run in GitHub Actions; use `gh` to inspect checks and logs, summarize failure context, draft a fix plan, and implement only after explicit approval. Treat external providers (for example Buildkite) as out of scope and report only the details URL.</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/gh-fix-ci/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="security-best-practices" data-skill-scope="project" data-skill-origin="terceros" data-skill-package="openai-skills" data-skill-category="C&#243;digo, pruebas y seguridad" data-skill-search="Revisar la seguridad del c&#243;digo Analiza pr&#225;cticas de seguridad del lenguaje y framework y propone mejoras. Usa la skill security-best-practices para revisar la seguridad del c&#243;digo. Te indicar&#233; los archivos o datos con los que trabajar. security-best-practices C&#243;digo, pruebas y seguridad Perform language and framework specific security best-practice reviews and suggest improvements. Trigger only when the user explicitly requests security best practices guidance, a security review/report, or secure-by-default coding help. Trigger only for supported languages (python, javascript/typescript, go). Do not trigger for general... Skills de OpenAI openai/skills">
+        <div class="skill-card-head">
+          <span class="skill-topic">C&#243;digo, pruebas y seguridad</span>
+          <span class="skill-origin-badge origin-terceros" title="Paquete de terceros &#183; repositorio openai/skills">Skills de OpenAI</span>
+        </div>
+        <h3>Revisar la seguridad del c&#243;digo</h3>
+        <p class="skill-slug"><code>security-best-practices</code></p>
+        <p>Analiza pr&#225;cticas de seguridad del lenguaje y framework y propone mejoras.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill security-best-practices para revisar la seguridad del c&#243;digo. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>security-best-practices</code></p>
+          <p><strong>Origen:</strong> Skills de OpenAI · repositorio <a href="https://github.com/openai/skills" target="_blank" rel="noopener noreferrer">openai/skills</a></p>
+          <p><strong>Descripción de origen:</strong> Perform language and framework specific security best-practice reviews and suggest improvements. Trigger only when the user explicitly requests security best practices guidance, a security review/report, or secure-by-default coding help. Trigger only for supported languages (python, javascript/typescript, go). Do not trigger for general...</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/security-best-practices/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="security-threat-model" data-skill-scope="project" data-skill-origin="terceros" data-skill-package="openai-skills" data-skill-category="C&#243;digo, pruebas y seguridad" data-skill-search="Analizar posibles amenazas de una aplicaci&#243;n Identifica activos, puntos de entrada, escenarios de abuso y medidas de protecci&#243;n. Usa la skill security-threat-model para analizar posibles amenazas de una aplicaci&#243;n. Te indicar&#233; los archivos o datos con los que trabajar. security-threat-model C&#243;digo, pruebas y seguridad Repository-grounded threat modeling that enumerates trust boundaries, assets, attacker capabilities, abuse paths, and mitigations, and writes a concise Markdown threat model. Trigger only when the user explicitly asks to threat model a codebase or path, enumerate threats/abuse paths, or perform AppSec threat modeling. Do not trigger for... Skills de OpenAI openai/skills">
+        <div class="skill-card-head">
+          <span class="skill-topic">C&#243;digo, pruebas y seguridad</span>
+          <span class="skill-origin-badge origin-terceros" title="Paquete de terceros &#183; repositorio openai/skills">Skills de OpenAI</span>
+        </div>
+        <h3>Analizar posibles amenazas de una aplicaci&#243;n</h3>
+        <p class="skill-slug"><code>security-threat-model</code></p>
+        <p>Identifica activos, puntos de entrada, escenarios de abuso y medidas de protecci&#243;n.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill security-threat-model para analizar posibles amenazas de una aplicaci&#243;n. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>security-threat-model</code></p>
+          <p><strong>Origen:</strong> Skills de OpenAI · repositorio <a href="https://github.com/openai/skills" target="_blank" rel="noopener noreferrer">openai/skills</a></p>
+          <p><strong>Descripción de origen:</strong> Repository-grounded threat modeling that enumerates trust boundaries, assets, attacker capabilities, abuse paths, and mitigations, and writes a concise Markdown threat model. Trigger only when the user explicitly asks to threat model a codebase or path, enumerate threats/abuse paths, or perform AppSec threat modeling. Do not trigger for...</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/security-threat-model/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="webapp-testing" data-skill-scope="project" data-skill-origin="terceros" data-skill-package="anthropics-skills" data-skill-category="C&#243;digo, pruebas y seguridad" data-skill-search="Probar una aplicaci&#243;n web en el navegador Comprueba interacciones, captura pantallas y revisa errores de consola mediante Playwright. Usa la skill webapp-testing para probar una aplicaci&#243;n web en el navegador. Te indicar&#233; los archivos o datos con los que trabajar. webapp-testing C&#243;digo, pruebas y seguridad Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs. Skills de Anthropic anthropics/skills">
+        <div class="skill-card-head">
+          <span class="skill-topic">C&#243;digo, pruebas y seguridad</span>
+          <span class="skill-origin-badge origin-terceros" title="Paquete de terceros &#183; repositorio anthropics/skills">Skills de Anthropic</span>
+        </div>
+        <h3>Probar una aplicaci&#243;n web en el navegador</h3>
+        <p class="skill-slug"><code>webapp-testing</code></p>
+        <p>Comprueba interacciones, captura pantallas y revisa errores de consola mediante Playwright.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill webapp-testing para probar una aplicaci&#243;n web en el navegador. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>webapp-testing</code></p>
+          <p><strong>Origen:</strong> Skills de Anthropic · repositorio <a href="https://github.com/anthropics/skills" target="_blank" rel="noopener noreferrer">anthropics/skills</a></p>
+          <p><strong>Descripción de origen:</strong> Toolkit for interacting with and testing local web applications using Playwright. Supports verifying frontend functionality, debugging UI behavior, capturing browser screenshots, and viewing browser logs.</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/webapp-testing/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="agent-customization" data-skill-scope="project" data-skill-origin="propia" data-skill-package="propia" data-skill-category="Organizar el trabajo de la IA" data-skill-search="Configurar c&#243;mo trabaja la IA Crea y revisa las instrucciones, prompts y perfiles que sigue el agente en tus proyectos. Usa la skill agent-customization para configurar c&#243;mo trabaja la IA. Te indicar&#233; los archivos o datos con los que trabajar. agent-customization Organizar el trabajo de la IA Crea, actualiza, revisa, arregla o debuggea archivos de personalizaci&#243;n de agentes (.instructions.md, .prompt.md, .agent.md, SKILL.md, copilot-instructions.md, AGENTS.md). Usa cuando necesites guardar preferencias de c&#243;digo, diagnosticar por qu&#233; instrucciones no se invocan, configurar patrones applyTo, definir restricciones de herramient... Propia de Skill Maestra ">
+        <div class="skill-card-head">
+          <span class="skill-topic">Organizar el trabajo de la IA</span>
+          <span class="skill-origin-badge origin-propia" title="Escrita o adaptada a mano por el equipo Skill Maestra">&#9733; Propia de Skill Maestra</span>
+        </div>
+        <h3>Configurar c&#243;mo trabaja la IA</h3>
+        <p class="skill-slug"><code>agent-customization</code></p>
+        <p>Crea y revisa las instrucciones, prompts y perfiles que sigue el agente en tus proyectos.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill agent-customization para configurar c&#243;mo trabaja la IA. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>agent-customization</code></p>
+          <p><strong>Origen:</strong> Propia de Skill Maestra</p>
+          <p><strong>Descripción de origen:</strong> Crea, actualiza, revisa, arregla o debuggea archivos de personalizaci&#243;n de agentes (.instructions.md, .prompt.md, .agent.md, SKILL.md, copilot-instructions.md, AGENTS.md). Usa cuando necesites guardar preferencias de c&#243;digo, diagnosticar por qu&#233; instrucciones no se invocan, configurar patrones applyTo, definir restricciones de herramient...</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/agent-customization/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="codex-computer-use" data-skill-scope="project" data-skill-origin="propia" data-skill-package="propia" data-skill-category="Organizar el trabajo de la IA" data-skill-search="Configurar el control del ordenador Diagnostica y configura el uso de aplicaciones de escritorio desde Codex. Usa la skill codex-computer-use para configurar el control del ordenador. Te indicar&#233; los archivos o datos con los que trabajar. codex-computer-use Organizar el trabajo de la IA Diagnostica, configura y usa Codex Computer Use / Uso del ordenador en Windows o macOS. Usar cuando el usuario quiera manejar aplicaciones de escritorio desde Codex, abrir apps con @Computer, permitir apps, revisar permisos, comprobar computer-use/config.toml o explicar limites de seguridad. Propia de Skill Maestra ">
+        <div class="skill-card-head">
+          <span class="skill-topic">Organizar el trabajo de la IA</span>
+          <span class="skill-origin-badge origin-propia" title="Escrita o adaptada a mano por el equipo Skill Maestra">&#9733; Propia de Skill Maestra</span>
+        </div>
+        <h3>Configurar el control del ordenador</h3>
+        <p class="skill-slug"><code>codex-computer-use</code></p>
+        <p>Diagnostica y configura el uso de aplicaciones de escritorio desde Codex.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill codex-computer-use para configurar el control del ordenador. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>codex-computer-use</code></p>
+          <p><strong>Origen:</strong> Propia de Skill Maestra</p>
+          <p><strong>Descripción de origen:</strong> Diagnostica, configura y usa Codex Computer Use / Uso del ordenador en Windows o macOS. Usar cuando el usuario quiera manejar aplicaciones de escritorio desde Codex, abrir apps con @Computer, permitir apps, revisar permisos, comprobar computer-use/config.toml o explicar limites de seguridad.</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/codex-computer-use/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="find-skills" data-skill-scope="project" data-skill-origin="propia" data-skill-package="propia" data-skill-category="Organizar el trabajo de la IA" data-skill-search="Buscar una skill para una tarea Localiza skills existentes cuando quieras ampliar capacidades o encontrar una herramienta adecuada. Usa la skill find-skills para buscar una skill para una tarea. Te indicar&#233; los archivos o datos con los que trabajar. find-skills Organizar el trabajo de la IA Descubre skills existentes del repo o del ecosistema abierto cuando el usuario pregunte si hay una skill para algo, quiera ampliar capacidades, buscar workflows reutilizables, instalar skills de terceros o evaluar si conviene crear una nueva skill local. Cubre: skills.sh, npx skills find, npx skills add, comparaci&#243;n entre skill local y e... Propia de Skill Maestra ">
+        <div class="skill-card-head">
+          <span class="skill-topic">Organizar el trabajo de la IA</span>
+          <span class="skill-origin-badge origin-propia" title="Escrita o adaptada a mano por el equipo Skill Maestra">&#9733; Propia de Skill Maestra</span>
+        </div>
+        <h3>Buscar una skill para una tarea</h3>
+        <p class="skill-slug"><code>find-skills</code></p>
+        <p>Localiza skills existentes cuando quieras ampliar capacidades o encontrar una herramienta adecuada.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill find-skills para buscar una skill para una tarea. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>find-skills</code></p>
+          <p><strong>Origen:</strong> Propia de Skill Maestra</p>
+          <p><strong>Descripción de origen:</strong> Descubre skills existentes del repo o del ecosistema abierto cuando el usuario pregunte si hay una skill para algo, quiera ampliar capacidades, buscar workflows reutilizables, instalar skills de terceros o evaluar si conviene crear una nueva skill local. Cubre: skills.sh, npx skills find, npx skills add, comparaci&#243;n entre skill local y e...</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/find-skills/SKILL.md</code></p>
+        </details>
+      </article>
+      <article class="auto-card" data-skill-name="skill-creator" data-skill-scope="project" data-skill-origin="propia" data-skill-package="propia" data-skill-category="Organizar el trabajo de la IA" data-skill-search="Crear una nueva skill reutilizable Prepara una skill con instrucciones y estructura para que el agente pueda descubrirla y utilizarla. Usa la skill skill-creator para crear una nueva skill reutilizable. Te indicar&#233; los archivos o datos con los que trabajar. skill-creator Organizar el trabajo de la IA Crea nuevas skills reutilizables para VS Code/Copilot con SKILL.md valido, estructura estandar, checklist de discovery y scaffold de carpetas. Usar cuando pidas crear o mejorar una skill futura. Propia de Skill Maestra ">
+        <div class="skill-card-head">
+          <span class="skill-topic">Organizar el trabajo de la IA</span>
+          <span class="skill-origin-badge origin-propia" title="Escrita o adaptada a mano por el equipo Skill Maestra">&#9733; Propia de Skill Maestra</span>
+        </div>
+        <h3>Crear una nueva skill reutilizable</h3>
+        <p class="skill-slug"><code>skill-creator</code></p>
+        <p>Prepara una skill con instrucciones y estructura para que el agente pueda descubrirla y utilizarla.</p>
+        <p class="skill-availability">Disponible en este proyecto</p>
+        <div class="skill-example"><strong>Ejemplo para pedirlo en el chat</strong><p class="skill-prompt">Usa la skill skill-creator para crear una nueva skill reutilizable. Te indicar&#233; los archivos o datos con los que trabajar.</p></div>
+        <button type="button" class="btn btn-primary" data-copy-prompt>Copiar ejemplo</button>
+        <details class="skill-details"><summary>Detalles técnicos</summary>
+          <p><strong>Nombre de la skill:</strong> <code>skill-creator</code></p>
+          <p><strong>Origen:</strong> Propia de Skill Maestra</p>
+          <p><strong>Descripción de origen:</strong> Crea nuevas skills reutilizables para VS Code/Copilot con SKILL.md valido, estructura estandar, checklist de discovery y scaffold de carpetas. Usar cuando pidas crear o mejorar una skill futura.</p>
+          <p><strong>Archivo:</strong> <code>.github/skills/skill-creator/SKILL.md</code></p>
+        </details>
+      </article></div>
+    <div id="skill-empty" class="ops-empty" hidden><p>Prueba con otra palabra o elimina los filtros para explorar el catálogo completo.</p><button type="button" class="btn btn-ghost" data-reset-skills>Ver todas las skills</button></div>
+    <nav id="skill-pagination" class="catalog-pagination" aria-label="Páginas del catálogo"><button id="skill-prev" type="button" class="btn btn-ghost">Anterior</button><span id="skill-page"></span><button id="skill-next" type="button" class="btn btn-ghost">Siguiente</button></nav>
+  </section>
+
+  <section id="panel-scripts" class="portal-panel" hidden>
+    <div class="auto-panel-head">
+      <div>
+        <p class="auto-eyebrow">Automatizaciones y utilidades</p>
+        <h2>Scripts: código para tareas concretas</h2><p class="catalog-explanation">Son archivos que automatizan un trabajo cuando se ejecutan. Abre el visor para consultar su código y las opciones disponibles.</p>
+      </div>
+    </div>
+    <div class="auto-card-grid">
+      <article class="auto-card">
+        <div class="auto-card-head">
+          <span class="auto-icon auto-icon-scripts" aria-hidden="true"></span>
+          <div>
+            <h3>Actualizar este catálogo</h3>
+            <span>Inventario de herramientas</span>
+          </div>
+        </div>
+        <p>Lee las skills instaladas y regenera esta página con los nombres, descripciones y contadores actuales.</p>
+        <details class="skill-details"><summary>Archivo del script</summary><code>_archivos_por_categoria/scripts/ps1/Update-SkillMaestraWebIndex.ps1</code></details>
+        <a class="btn btn-primary" href="./scripts-viewer.html?file=_archivos_por_categoria/scripts/ps1/Update-SkillMaestraWebIndex.ps1&amp;readonly=1">Consultar código</a>
+      </article>
+      <article class="auto-card">
+        <div class="auto-card-head">
+          <span class="auto-icon auto-icon-scripts" aria-hidden="true"></span>
+          <div>
+            <h3>Sincronizar skills al catálogo global</h3>
+            <span>Copia de .github/skills a ~/.agents/skills</span>
+          </div>
+        </div>
+        <p>Copia cada skill del proyecto a la carpeta global del usuario para que esté disponible en todos los repositorios. Prueba primero con -WhatIf.</p>
+        <details class="skill-details"><summary>Archivo del script</summary><code>shared/scripts/sync-global-skills.ps1</code></details>
+        <a class="btn btn-primary" href="./scripts-viewer.html?file=shared/scripts/sync-global-skills.ps1&amp;readonly=1">Consultar código</a>
+      </article>
+    </div>
+  </section>
+
+  <section id="panel-extensions" class="portal-panel extension-panel" hidden>
+    <div class="auto-panel-head">
+      <div>
+        <p class="auto-eyebrow">Extensiones y herramientas</p>
+        <h2>Extensiones: herramientas añadidas a VS Code</h2><p class="catalog-explanation">Añaden funciones al editor, como trabajar con Git, Azure, depurar código o hablar con la IA. El inventario explica para qué sirve cada una.</p>
+      </div>
+      <button class="btn btn-primary" onclick="location.href='./extensiones.html'">Ver extensiones instaladas</button>
+    </div>
+    <div class="extension-callout">
+      <strong>Incluye IA, Azure, Power Platform, Git, linting, diseno y utilidades.</strong>
+      <p>Usa este bloque cuando quieras comprobar que capacidades tiene el entorno antes de pedirle una tarea a la IA.</p>
+    </div>
+  </section>
+
+  <section id="panel-instructions" class="portal-panel" hidden>
+    <div class="auto-panel-head">
+      <div>
+        <p class="auto-eyebrow">Instrucciones dadas a la IA</p>
+        <h2>Cómo debe trabajar la IA en este proyecto</h2><p class="catalog-explanation">Estas 5 reglas indican al agente cómo actuar, qué comprobar y qué límites respetar.</p>
+      </div>
+      <button class="btn btn-ghost" onclick="openSkill('.github/copilot-instructions.md')">Abrir archivo completo</button>
+    </div>
+    <div class="auto-card-grid instructions-grid">
+      <article class="auto-card instruction">
+        <div class="auto-card-head">
+          <span class="auto-icon auto-icon-instruction" aria-hidden="true"></span>
+          <div>
+            <h3>Mejora continua de skills</h3>
+            <span>.github/copilot-instructions.md</span>
+          </div>
+        </div>
+        <p>- Cuando se descubra un error, una limitaci&#243;n o un camino m&#225;s r&#225;pido, corregir el `SKILL.md` correspondiente en la misma intervenci&#243;n para que no se repita.</p>
+        <button class="btn btn-primary" onclick="openSkill('.github/copilot-instructions.md')">Abrir instrucciones</button>
+      </article>
+      <article class="auto-card instruction">
+        <div class="auto-card-head">
+          <span class="auto-icon auto-icon-instruction" aria-hidden="true"></span>
+          <div>
+            <h3>Modo de trabajo</h3>
+            <span>.github/copilot-instructions.md</span>
+          </div>
+        </div>
+        <p>- Ejecutar de forma aut&#243;noma todo lo que se pueda y pedir datos solo cuando no haya forma de automatizarlo. - Ante un cambio con riesgo (datos, configuraci&#243;n, despliegues), actuar de la forma m&#225;s conservadora posible y preferir una prueba reversible antes del...</p>
+        <button class="btn btn-primary" onclick="openSkill('.github/copilot-instructions.md')">Abrir instrucciones</button>
+      </article>
+      <article class="auto-card instruction">
+        <div class="auto-card-head">
+          <span class="auto-icon auto-icon-instruction" aria-hidden="true"></span>
+          <div>
+            <h3>Regla de arranque</h3>
+            <span>.github/copilot-instructions.md</span>
+          </div>
+        </div>
+        <p>- Antes de empezar una tarea, leer la skill del dominio en `.github/skills/&lt;nombre&gt;/SKILL.md` y seguirla. - Si la tarea toca un dominio con skill disponible, cargarla antes de buscar, editar o ejecutar nada.</p>
+        <button class="btn btn-primary" onclick="openSkill('.github/copilot-instructions.md')">Abrir instrucciones</button>
+      </article>
+      <article class="auto-card instruction">
+        <div class="auto-card-head">
+          <span class="auto-icon auto-icon-instruction" aria-hidden="true"></span>
+          <div>
+            <h3>Seguridad</h3>
+            <span>.github/copilot-instructions.md</span>
+          </div>
+        </div>
+        <p>- Nunca subir secretos ni configuraci&#243;n local (`.env`, `local.settings.json`, tokens). - No desplegar ni publicar en producci&#243;n sin confirmaci&#243;n expl&#237;cita.</p>
+        <button class="btn btn-primary" onclick="openSkill('.github/copilot-instructions.md')">Abrir instrucciones</button>
+      </article>
+      <article class="auto-card instruction">
+        <div class="auto-card-head">
+          <span class="auto-icon auto-icon-instruction" aria-hidden="true"></span>
+          <div>
+            <h3>Verificaci&#243;n</h3>
+            <span>.github/copilot-instructions.md</span>
+          </div>
+        </div>
+        <p>- Tras cualquier cambio, comprobar el resultado real (archivo generado, p&#225;gina renderizada, salida del script) antes de darlo por terminado. - Que un comando devuelva &#233;xito no basta: verificar que el cambio est&#225; presente.</p>
+        <button class="btn btn-primary" onclick="openSkill('.github/copilot-instructions.md')">Abrir instrucciones</button>
+      </article>
+    </div>
+  </section>
+
+  <details id="panel-skill-health" class="catalog-technical">
+    <summary>Detalles técnicos del catálogo y diagnóstico</summary>
+    <p>Actualizado: 2026-10-11 11:22:30. Las skills se leen de las carpetas locales cuando se ejecuta el actualizador de la web.</p>
+    <dl><dt>14 skills distintas</dt><dd>0 en la carpeta global y 14 en el proyecto. Las copias con el mismo nombre aparecen en una sola ficha.</dd>
+      <dt>Comprobación de nombre y descripción: OK</dt><dd>Comprueba los datos de identificación de los archivos. No verifica que cada conexión o herramienta esté lista para ejecutarse.</dd>
+      <dt>Carpeta global</dt><dd>C:\Users\usuario\.agents\skills</dd><dt>Carpeta de Claude</dt><dd>C:\Users\usuario\.claude\skills — 0 skills detectadas.</dd></dl>
+    <p><button class="btn btn-ghost" onclick="openSkill('_archivos_por_categoria/web/md/catalogo-skills.md')">Ver inventario técnico completo</button></p>
+  </details>
+  <p id="copy-status" class="catalog-toast" role="status" aria-live="polite"></p>
+  <dialog id="copy-dialog" aria-labelledby="copy-title"><h2 id="copy-title">Copia el ejemplo al chat</h2><p>El navegador no permite copiar automáticamente. Selecciona el texto y usa Copiar.</p><textarea aria-label="Ejemplo para copiar" readonly></textarea><button type="button" class="btn btn-primary">Cerrar</button></dialog>
+  <script src="./skill-catalog.js" defer></script>
+<!-- AUTO-INDEX-SKILL-MAESTRA:END -->
+</div>
+
+<footer>Skill Maestra · 14 skills distintas · Inventario actualizado el 2026-10-11 11:22:30</footer>
+
+
+</body>
+</html>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trucos — Skill Maestra</title>
+  <!-- Pagina mantenida a mano (no la genera ningun script). Para anadir un truco,
+       copiar una <article class="truco"> de la categoria que toque y editarla. -->
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 10% 0%, #e8f0ff 0%, #f5f7fb 40%);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: #1f2937;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 0 0 10px 0;
+      color: #0f3460;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #6b7280;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .subtitle a { color: #0f3460; }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 16px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #1f2937;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      border-color: #0f3460;
+      background: #f0f9ff;
+    }
+
+    /* Buscador: copiado de comandos.html */
+    .search-wrap { position: relative; margin-bottom: 20px; }
+    .search-input {
+      width: 100%; padding: 12px 16px 12px 42px; border-radius: 12px;
+      border: 1.5px solid #d7e1ef; font-size: 0.95rem; background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .search-input:focus { border-color: #0f3460; box-shadow: 0 0 0 3px rgba(15,52,96,0.12); outline: none; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: .45; pointer-events: none; }
+    .search-count { font-size: 0.78rem; color: #6b7280; margin: -10px 0 18px 2px; }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .chip {
+      display: inline-block;
+      text-decoration: none;
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      color: #0f3460;
+      background: #f8fbff;
+      transition: all .2s ease;
+    }
+
+    .chip:hover {
+      background: #e8f1ff;
+      border-color: #0f3460;
+    }
+
+    .category {
+      margin-bottom: 40px;
+      scroll-margin-top: 16px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      padding: 12px 20px;
+      border-radius: 10px;
+      margin: 0 0 12px 0;
+      font-weight: 600;
+    }
+
+    .category.claude h2 { background: #ffe4d6; color: #9a3412; }
+    .category.voz h2 { background: #ddd6fe; color: #5b21b6; }
+    .category.vscode h2 { background: #dbeafe; color: #1e40af; }
+    .category.windows h2 { background: #dcfce7; color: #166534; }
+    .category.flujo h2 { background: #fef3c7; color: #78350f; }
+
+    .category-note {
+      margin: 0 0 16px 4px;
+      font-size: 0.88rem;
+      color: #6b7280;
+    }
+
+    .trucos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+      gap: 16px;
+    }
+
+    .truco {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      min-width: 0;
+    }
+
+    .truco:hover {
+      border-color: #0f3460;
+      box-shadow: 0 4px 12px rgba(15,52,96,0.15);
+      transform: translateY(-2px);
+    }
+
+    .truco.ancho { grid-column: 1 / -1; }
+
+    .truco-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .truco h3 {
+      margin: 0;
+      font-size: 1.02rem;
+      color: #0f3460;
+      line-height: 1.35;
+    }
+
+    .badge {
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #166534;
+      white-space: nowrap;
+    }
+
+    .truco p, .truco li {
+      color: #4b5563;
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .truco p { margin: 0 0 8px 0; }
+
+    .truco ul, .truco ol {
+      margin: 0 0 8px 0;
+      padding-left: 20px;
+    }
+
+    .truco li { margin-bottom: 4px; }
+
+    .para::before {
+      content: "Para qué: ";
+      font-weight: 700;
+      color: #0f3460;
+    }
+
+    .analogia {
+      background: #f8fafc;
+      border-left: 3px solid #94a3b8;
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+      font-style: italic;
+    }
+
+    .ojo {
+      background: #fff7ed;
+      border-left: 3px solid #f59e0b;
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+    }
+
+    .ojo.riesgo {
+      background: #fef2f2;
+      border-left-color: #dc2626;
+    }
+
+    code, kbd {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.82rem;
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: #0f172a;
+      word-break: break-word;
+    }
+
+    kbd {
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-bottom-width: 2px;
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: #0f172a;
+      white-space: nowrap;
+    }
+
+    .code-wrap {
+      position: relative;
+      margin: 0 0 8px 0;
+    }
+
+    pre {
+      margin: 0;
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 34px 14px 12px 14px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 0.72rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #475569;
+      background: #1e293b;
+      color: #e2e8f0;
+      cursor: pointer;
+    }
+
+    .copy-btn:hover { background: #334155; }
+
+    details {
+      margin-top: 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 8px 12px;
+      background: #fafafa;
+    }
+
+    details > summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #0f3460;
+      font-size: 0.9rem;
+    }
+
+    details[open] > summary { margin-bottom: 10px; }
+
+    .sin-resultados {
+      display: none;
+      text-align: center;
+      color: #6b7280;
+      padding: 30px 0;
+    }
+
+    .pie {
+      margin-top: 20px;
+      background: white;
+      border: 1px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 16px 20px;
+      color: #4b5563;
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .pie h2 {
+      background: none;
+      padding: 0;
+      font-size: 1.1rem;
+      color: #0f3460;
+      margin-bottom: 8px;
+    }
+
+    .pie p { margin: 0 0 6px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="./index.html" class="back-btn">← Volver al índice</a>
+
+    <div class="header">
+      <h1>💡 Trucos</h1>
+      <p class="subtitle">Recetas para trabajar más rápido con Claude, VS Code y Windows: qué problema resuelven, cómo se hacen y qué hay que vigilar.<br>
+        El diccionario completo de comandos y atajos está en <a href="./comandos.html">Comandos del chat</a>.</p>
+    </div>
+
+    <div class="search-wrap">
+      <span class="search-icon">🔎</span>
+      <input type="text" class="search-input" id="buscar" placeholder="Buscar truco (ej: dictado, contexto, captura, MCP, deshacer...)">
+    </div>
+    <div class="search-count" id="contador"></div>
+
+    <nav class="chips" aria-label="Categorías de trucos">
+      <a class="chip" href="#claude">🤖 Claude Code</a>
+      <a class="chip" href="#voz">🎙️ Dictado y voz</a>
+      <a class="chip" href="#vscode">🧩 VS Code</a>
+      <a class="chip" href="#windows">🪟 Windows</a>
+      <a class="chip" href="#flujo">🛠️ Flujo de trabajo recomendado</a>
+    </nav>
+
+    <!-- ============ CLAUDE CODE ============ -->
+    <section class="category claude" id="claude">
+      <h2>🤖 Claude Code</h2>
+      <p class="category-note">Algunos comandos solo existen en la terminal (<code>claude</code>). En el panel de VS Code, escribe <code>/</code> para ver los que admite.</p>
+      <div class="trucos-grid">
+
+        <article class="truco">
+          <div class="truco-head"><h3>🐤 El canario: saber cuándo Claude empieza a olvidar</h3></div>
+          <p class="para">detectar que la conversación se ha hecho tan larga que Claude está perdiendo de vista las instrucciones del principio.</p>
+          <p class="analogia">Los mineros bajaban un canario a la mina: si dejaba de cantar, había gas y tocaba salir. Aquí el canario es tu nombre.</p>
+          <p>Añade esta línea a tus instrucciones globales, <code>C:\Users\&lt;tu usuario&gt;\.claude\CLAUDE.md</code> (si no existe, créalo):</p>
+          <div class="code-wrap"><pre>- Empieza siempre cada respuesta llamándome por mi nombre: Ana.</pre></div>
+          <p>Si un día deja de decir tu nombre, toca <code>/compact</code> o abrir una conversación nueva. Si solo lo quieres en un proyecto, ponlo en el <code>CLAUDE.md</code> de ese proyecto.</p>
+          <p class="ojo">Que lo siga diciendo no garantiza que lo recuerde todo: tras un <code>/compact</code> (manual o automático) Claude vuelve a leer el <code>CLAUDE.md</code> y el canario "revive" aunque el resumen haya dejado detalles fuera. La medida exacta la da <code>/context</code>.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>📏 Conversación larga: medir, resumir o empezar de cero</h3></div>
+          <p class="para">que Claude no se vuelva lento ni pierda el hilo cuando la conversación crece.</p>
+          <p class="analogia">Es como la mesa de trabajo: cuando se llena de papeles, o la ordenas (resumen) o la despejas (conversación nueva).</p>
+          <ul>
+            <li><code>/context</code>: enseña cuánto espacio llevas gastado y en qué.</li>
+            <li><code>/compact</code> + qué conservar: resume y sigue. Ejemplo: <code>/compact conserva los IDs de flujo y lo que queda pendiente</code>.</li>
+            <li><code>/clear</code>: conversación limpia al cambiar de tema. La anterior no se pierde: <code>/resume</code> la recupera.</li>
+          </ul>
+          <p class="ojo">El resumen puede dejar fuera detalles. Lo que no se pueda perder (IDs, decisiones, pasos pendientes), que Claude lo apunte en un archivo antes de compactar.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🗺️ Modo plan: que piense antes de tocar nada</h3></div>
+          <p class="para">en cambios grandes o delicados, revisar el plan antes de que edite un solo archivo.</p>
+          <ul>
+            <li><kbd>Shift</kbd>+<kbd>Tab</kbd> dos veces (o <code>/plan</code>): modo plan. Investiga y te propone los pasos sin editar.</li>
+            <li><kbd>Shift</kbd>+<kbd>Tab</kbd> una vez: acepta ediciones sin preguntar en cada archivo.</li>
+            <li>Vuelve a pulsarlo para regresar al modo normal.</li>
+          </ul>
+          <p class="ojo">El modo de aceptar ediciones solo se salta la pregunta al editar archivos. No lo dejes puesto si la tarea va a modificar scripts que luego se lanzan contra producción.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>⏪ Deshacer lo que ha hecho Claude: /rewind</h3></div>
+          <p class="para">volver atrás cuando Claude ha tomado un mal camino.</p>
+          <p><code>/rewind</code> (también <code>/undo</code> o <code>/checkpoint</code>): eliges un punto anterior y restauras el código, la conversación o las dos cosas.</p>
+          <p class="ojo riesgo"><strong>Solo deshace las ediciones de archivos que hizo Claude.</strong> No deshace comandos ejecutados ni nada de la nube (flujos, apps, bases de datos, despliegues). Para eso, haz una copia de seguridad antes de cada cambio.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>💬 Pregunta al margen sin desviar la tarea: /btw</h3></div>
+          <p class="para">preguntar algo rápido mientras Claude trabaja, sin meter la pregunta en el hilo principal.</p>
+          <p>Ejemplo: <code>/btw ¿en qué puerto sale Live Preview?</code>. Responde aparte y la tarea sigue donde estaba.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🎯 Señalar código: selección + Alt+K</h3></div>
+          <p class="para">preguntar por un trozo concreto sin copiarlo ni explicar dónde está.</p>
+          <ul>
+            <li>Claude ya ve el archivo abierto y lo que tienes seleccionado: selecciona unas líneas y pregunta "¿qué hace esto?".</li>
+            <li>Con el foco en el editor, <kbd>Alt</kbd>+<kbd>K</kbd> inserta en el mensaje una mención <code>@archivo#líneas</code> de la selección, que queda fija aunque luego cambies de archivo.</li>
+          </ul>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>⌨️ Moverse entre el editor y Claude con el teclado</h3></div>
+          <ul>
+            <li><kbd>Ctrl</kbd>+<kbd>Esc</kbd>: salta a la caja de texto de Claude; otra vez, vuelve al editor.</li>
+            <li><kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>F</kbd> (en el panel): vista Focus, pliega las herramientas y deja solo el texto.</li>
+            <li>Dos conversaciones a la vez: paleta de comandos → <code>Claude Code: Open in New Tab</code>.</li>
+          </ul>
+          <p class="ojo">La extensión asigna <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd> a abrir una pestaña nueva, pero en Windows esa combinación abre el Administrador de tareas. Por eso conviene usar la paleta.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>📌 Dónde poner las reglas permanentes</h3></div>
+          <p class="para">no tener que repetirle a Claude lo mismo en cada conversación.</p>
+          <ul>
+            <li><strong>Para ti, en todos los proyectos:</strong> <code>C:\Users\&lt;usuario&gt;\.claude\CLAUDE.md</code> (forma de responder, idioma, el canario).</li>
+            <li><strong>Para un proyecto:</strong> el <code>CLAUDE.md</code> de su carpeta. En este repositorio, las reglas comunes a todos los agentes viven en <code>.github/copilot-instructions.md</code>.</li>
+            <li><code>/memory</code> abre esos archivos para editarlos.</li>
+          </ul>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>📊 Cuánto llevas gastado y cuánto piensa</h3></div>
+          <ul>
+            <li><code>/usage</code> (o <code>/cost</code>, <code>/stats</code>): consumo de la sesión y del plan.</li>
+            <li><code>/model</code>: cambia de modelo.</li>
+            <li><code>/effort</code>: cuánto razona antes de responder. Más esfuerzo para diagnósticos difíciles; menos para tareas mecánicas.</li>
+          </ul>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🖼️ Enseñarle una captura</h3><span class="badge">Recomendado</span></div>
+          <p class="para">que Claude vea un error, una pantalla de la app o un mensaje del portal sin describirlo.</p>
+          <ol>
+            <li><kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> y recorta la zona.</li>
+            <li>Pulsa <kbd>Ctrl</kbd>+<kbd>V</kbd> en la caja de texto de Claude. Admite PNG, JPG, GIF y WebP.</li>
+          </ol>
+          <p class="ojo">Mira la captura antes de pegarla: si sale una contraseña, un token o datos personales, recórtala.</p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============ DICTADO Y VOZ ============ -->
+    <section class="category voz" id="voz">
+      <h2>🎙️ Dictado y voz</h2>
+      <div class="trucos-grid">
+
+        <article class="truco ancho">
+          <div class="truco-head"><h3>🖱️ Dictar a Claude con el botón de la rueda del ratón</h3><span class="badge">Recomendado</span></div>
+          <p class="para">hablarle a Claude en VS Code sin tocar el teclado.</p>
+          <ul>
+            <li><strong>Rueda mantenida:</strong> hablas mientras la tienes pulsada; al soltarla, el mensaje se envía solo.</li>
+            <li><strong>Clic corto:</strong> empieza a dictar y se queda escuchando. Otro clic lo para. En este modo no se envía nada: revisas el texto y pulsas Intro tú.</li>
+            <li>Solo actúa si VS Code es la ventana activa y el cursor está encima. En cualquier otro programa la rueda funciona como siempre.</li>
+          </ul>
+          <p><strong>Cómo funciona:</strong> la extensión de Claude ya trae dictado con <kbd>Ctrl</kbd>+<kbd>D</kbd> (foco en el panel). VS Code no deja asignar atajos a los botones del ratón, así que AutoHotkey, un programa gratuito para Windows, pulsa <kbd>Ctrl</kbd>+<kbd>D</kbd> cuando pulsas la rueda. Al parar, la extensión corta el micrófono en seco y se pierde la última palabra, así que el script sigue escuchando 0,8 s después de soltar (o del clic de parar) y solo entonces para. Antes de enviar, comprueba en el registro de privacidad de Windows que VS Code tenía de verdad el micrófono abierto; si no (foco en el editor, aviso de permisos), no pulsa Intro.</p>
+          <p class="ojo">Dentro de VS Code pierdes el clic central de siempre (cerrar pestañas con la rueda, seleccionar en columna). Probado con la extensión 2.1.286: si una actualización cambia el atajo de dictado, hay que cambiar la <code>d</code> del script.</p>
+
+          <details>
+            <summary>Cómo montarlo (4 pasos)</summary>
+            <p>Lo más rápido: pásale esta tarjeta a Claude y pídele que lo instale. A mano:</p>
+            <ol>
+              <li>Instala AutoHotkey v2 desde una terminal:
+                <div class="code-wrap"><pre>winget install --id AutoHotkey.AutoHotkey -e --scope user</pre></div></li>
+              <li>Crea <code>Documentos\AutoHotkey\dictado-claude.ahk</code> con el script de abajo.</li>
+              <li>Doble clic en el archivo. Aparece una "H" verde en la bandeja, junto al reloj, y ya funciona.</li>
+              <li>Para que arranque con Windows: <kbd>Win</kbd>+<kbd>R</kbd>, escribe <code>shell:startup</code> y crea ahí un acceso directo al <code>.ahk</code>.</li>
+            </ol>
+            <p><strong>Ajustes</strong> (al principio del script): si alguna vez aún se pierde la última palabra, sube <code>RetardoSoltar</code> (800 ms) a 1000 o 1200. Si no quieres que envíe solo, pon <code>EnviarAlSoltar := false</code>.</p>
+            <p><strong>Pausarlo:</strong> clic derecho en la "H" → <em>Suspend Hotkeys</em>. <strong>Quitarlo:</strong> clic derecho en la "H" → <em>Exit</em>, borrar el acceso directo de <code>shell:startup</code> y, si quieres, <code>winget uninstall AutoHotkey.AutoHotkey</code>.</p>
+          </details>
+
+          <details>
+            <summary>El script completo (dictado-claude.ahk)</summary>
+            <div class="code-wrap"><pre>; Dictado de Claude Code con el boton de la rueda del raton (2026-10-01)
+; - Clic corto en la rueda: empieza a dictar; otro clic: para (no envia).
+; - Rueda mantenida: dicta mientras la tengas pulsada y, al soltar, envia el mensaje.
+; Al parar (segundo clic o al soltar), sigue escuchando RetardoSoltar ms mas, para
+; que no se corte la ultima palabra: la extension corta el microfono en seco al parar
+; y tira lo que aun no habia transcrito.
+; Solo actua si VS Code es la ventana activa y el cursor esta encima de ella;
+; en cualquier otro programa la rueda funciona como siempre.
+; Equivale a pulsar Ctrl+D en el panel de Claude (atajo de dictado de la extension).
+; Se arranca solo con Windows desde la carpeta Inicio (acceso directo dictado-claude.lnk).
+; Para pausarlo: icono verde "H" de la bandeja &gt; Suspend Hotkeys. Para quitarlo: Exit
+; y borrar el acceso directo de shell:startup.
+
+#Requires AutoHotkey v2.0
+#SingleInstance Force
+
+; --- Ajustes ---
+EnviarAlSoltar := true   ; false = nunca pulsa Intro, solo dicta
+UmbralMantener := 400    ; ms pulsada para contar como "mantener"
+RetardoSoltar := 800     ; ms que sigue escuchando tras soltar o tras el clic de parar
+RetardoEnvio := 700      ; ms tras parar antes de pulsar Intro, para que se asiente el texto
+
+A_IconTip := "Dictado Claude con la rueda del raton"
+
+CursorSobreVSCode() {
+    if !WinActive("ahk_exe Code.exe")
+        return false
+    try {
+        MouseGetPos , , &amp;ventana
+        return WinGetProcessName("ahk_id " ventana) = "Code.exe"
+    }
+    return false
+}
+
+; Lee cuando abrio (LastUsedTimeStart) o cerro (LastUsedTimeStop) VS Code el
+; microfono, del registro de privacidad de Windows, el mismo que alimenta
+; "Configuracion &gt; Privacidad &gt; Microfono &gt; actividad reciente". Devuelve la hora
+; en formato FILETIME (UTC), o -1 si no se puede leer. Mientras el microfono
+; esta abierto, Windows deja LastUsedTimeStop a 0.
+UsoMicroVSCode(valor) {
+    try ruta := WinGetProcessPath("ahk_exe Code.exe")
+    catch
+        return -1
+    clave := "Software\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\microphone\NonPackaged\"
+        . StrReplace(ruta, "\", "#")
+    ; RegRead no admite valores REG_QWORD, se usa la API de Windows directamente.
+    ; -2147483647 = HKEY_CURRENT_USER (0x80000001 con signo); 0x48 = RRF_RT_QWORD.
+    hora := 0
+    if DllCall("Advapi32\RegGetValueW", "Ptr", -2147483647, "Str", clave, "Str", valor
+        , "UInt", 0x48, "Ptr", 0, "Int64*", &amp;hora, "UInt*", 8, "UInt") != 0
+        return -1
+    return hora
+}
+
+; true si VS Code tiene ahora mismo el microfono abierto, es decir, si esta dictando.
+DictadoActivo() {
+    return UsoMicroVSCode("LastUsedTimeStart") &gt; 0 &amp;&amp; UsoMicroVSCode("LastUsedTimeStop") = 0
+}
+
+; Ctrl+D como toque rapido (mucho menos de los 200 ms a partir de los cuales la
+; extension para el dictado al soltar la tecla): asi empieza o para, pero el
+; momento de parar lo decide este script y no la tecla.
+AlternarDictado() {
+    Send "^d"
+}
+
+PulsarIntro() {
+    if WinActive("ahk_exe Code.exe")
+        Send "{Enter}"
+}
+
+#HotIf CursorSobreVSCode()
+MButton:: {
+    pulsado := A_TickCount
+    if DictadoActivo() {
+        ; Este clic es para parar: se espera un poco para no cortar la ultima palabra.
+        KeyWait "MButton"
+        Sleep RetardoSoltar
+        if WinActive("ahk_exe Code.exe") &amp;&amp; DictadoActivo()
+            AlternarDictado()
+        return
+    }
+    AlternarDictado()
+    KeyWait "MButton"
+    if A_TickCount - pulsado &lt; UmbralMantener
+        return   ; clic corto: sigue dictando hasta el siguiente clic
+    ; Rueda mantenida: sigue escuchando un poco tras soltar y despues para.
+    Sleep RetardoSoltar
+    ; Si el microfono no se abrio, no se estaba dictando: el foco estaba en el editor
+    ; (alli Ctrl+D selecciona la siguiente coincidencia) o salio un aviso de permisos.
+    ; Entonces no se vuelve a pulsar Ctrl+D ni se envia nada.
+    if !WinActive("ahk_exe Code.exe") || !DictadoActivo()
+        return
+    AlternarDictado()
+    if EnviarAlSoltar
+        SetTimer PulsarIntro, -RetardoEnvio
+}
+#HotIf</pre></div>
+          </details>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🎤 Dictado sin instalar nada: Ctrl+D en el panel</h3></div>
+          <p class="para">dictar a Claude hoy mismo, sin AutoHotkey.</p>
+          <ul>
+            <li>Con el foco en la caja de texto de Claude, <kbd>Ctrl</kbd>+<kbd>D</kbd> enciende o apaga el dictado.</li>
+            <li>Si lo mantienes pulsado más de 0,2 s, dicta mientras sigas pulsando.</li>
+          </ul>
+          <p class="ojo">Si el foco está en el editor, <kbd>Ctrl</kbd>+<kbd>D</kbd> no dicta: selecciona la siguiente coincidencia de la palabra. Pulsa antes <kbd>Ctrl</kbd>+<kbd>Esc</kbd> para saltar al panel.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🗣️ Dictado de Windows en cualquier programa: Win+H</h3></div>
+          <p class="para">dictar en Teams, Outlook, el navegador o donde no haya micrófono propio.</p>
+          <p><kbd>Win</kbd>+<kbd>H</kbd> abre el dictado de Windows sobre el campo de texto donde esté el cursor. Otra vez <kbd>Win</kbd>+<kbd>H</kbd> lo cierra.</p>
+          <p class="ojo">Escribe donde esté el cursor en ese momento: si el foco salta a otra ventana mientras hablas, el texto va a parar allí.</p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============ VS CODE ============ -->
+    <section class="category vscode" id="vscode">
+      <h2>🧩 VS Code</h2>
+      <div class="trucos-grid">
+
+        <article class="truco">
+          <div class="truco-head"><h3>🌐 Ver las webs locales con Live Preview</h3><span class="badge">Recomendado</span></div>
+          <p class="para">ver esta misma web (o cualquier HTML del repo) como página y no como código.</p>
+          <ul>
+            <li>Con el HTML abierto: <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> → "Vista previa dinámica: Mostrar vista previa".</li>
+            <li>Claude lo abre solo con un enlace del tipo <code>vscode://command/livePreview.start.preview.atFileString?...</code> y sirve en <code>http://127.0.0.1:3000</code>.</li>
+          </ul>
+          <p class="ojo">No hace falta <code>python -m http.server</code> ni abrir el navegador aparte: Live Preview ya tiene su propio servidor.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>✂️ Editar varias apariciones a la vez</h3></div>
+          <p class="para">renombrar o cambiar lo mismo en varias líneas de un golpe.</p>
+          <ul>
+            <li><kbd>Ctrl</kbd>+<kbd>D</kbd>: añade la siguiente aparición de la palabra seleccionada.</li>
+            <li><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd>: selecciona todas las apariciones.</li>
+            <li><kbd>Alt</kbd>+clic: pone un cursor más donde hagas clic.</li>
+          </ul>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🧭 Moverse rápido por el repo</h3></div>
+          <ul>
+            <li><kbd>Ctrl</kbd>+<kbd>P</kbd>: abre un archivo escribiendo parte del nombre.</li>
+            <li><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>: paleta de comandos (todo lo que hace VS Code y sus extensiones).</li>
+            <li><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>: busca un texto en todo el repo.</li>
+          </ul>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>📄 Leer los informes .md bien formateados</h3></div>
+          <p class="para">leer los informes de la carpeta de documentación de tu proyecto como documento, no como texto plano.</p>
+          <ul>
+            <li><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd>: vista previa en una pestaña.</li>
+            <li><kbd>Ctrl</kbd>+<kbd>K</kbd> y luego <kbd>V</kbd>: vista previa al lado, para editar y ver a la vez.</li>
+          </ul>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============ WINDOWS ============ -->
+    <section class="category windows" id="windows">
+      <h2>🪟 Windows</h2>
+      <div class="trucos-grid">
+
+        <article class="truco">
+          <div class="truco-head"><h3>📋 Historial del portapapeles: Win+V</h3></div>
+          <p class="para">recuperar algo que copiaste hace un rato y que ya has pisado con otra copia.</p>
+          <p><kbd>Win</kbd>+<kbd>V</kbd> enseña lo último que has copiado; eliges y se pega. La primera vez pide activarlo.</p>
+          <p class="ojo">Guarda también contraseñas y tokens que hayas copiado. Puedes borrar una entrada desde el propio panel.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🚀 Que algo arranque con Windows: shell:startup</h3><span class="badge">Recomendado</span></div>
+          <p><kbd>Win</kbd>+<kbd>R</kbd>, escribe <code>shell:startup</code> e Intro: se abre la carpeta Inicio. Lo que pongas ahí (un acceso directo) arranca al iniciar sesión. Así arranca el script de la rueda.</p>
+          <p>Para quitarlo, borra el acceso directo de esa carpeta.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🐚 PowerShell, no Git Bash, para az y explorer</h3><span class="badge">Recomendado</span></div>
+          <p class="para">evitar errores raros con rutas.</p>
+          <p>Git Bash convierte por su cuenta lo que empieza por <code>/</code> en una ruta de Windows. Rompe los IDs de Azure (<code>/subscriptions/...</code>) y opciones como <code>explorer.exe /select</code>.</p>
+          <p>Con <code>az</code> y con el explorador, usa PowerShell. Si Claude ve un error de ruta en un comando así, que lo repita en PowerShell.</p>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ============ FLUJO DE TRABAJO ============ -->
+    <section class="category flujo" id="flujo">
+      <h2>🛠️ Flujo de trabajo recomendado</h2>
+      <div class="trucos-grid">
+
+        <article class="truco">
+          <div class="truco-head"><h3>📝 Pedir propuesta en un .md antes de tocar producción</h3><span class="badge">Recomendado</span></div>
+          <p class="para">no tocar producción con un requisito a medio entender (por ejemplo, uno que llega por una llamada).</p>
+          <p>Pídele a Claude: "hazme primero una propuesta en un .md con tu recomendación y las dudas abiertas, sin tocar nada". Se revisa, se responde a las dudas y solo entonces se aplica.</p>
+          <p class="ojo riesgo">Nada se despliega en producción sin un "sí" explícito. Las automatizaciones tampoco se prueban ni se lanzan sin permiso.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>👥 El equipo de tres subagentes: planificar, hacer y revisar</h3><span class="badge">Recomendado</span></div>
+          <p class="para">que en un cambio importante (varias piezas, configuración global, cerca de producción) no se cuele un fallo.</p>
+          <ol>
+            <li><strong>Planificador</strong>: diseña el plan sin tocar nada. Si la petición es ambigua, solo devuelve preguntas. Cada tarea lleva su "Hecho cuando:".</li>
+            <li><strong>Implementador</strong> (con Sonnet, gasta menos): aplica el plan sin rediseñarlo y responde en 4 puntos: qué hizo, archivos, pruebas y decisiones.</li>
+            <li><strong>Revisor</strong>: solo lee y comprueba el resultado real, requisito a requisito. Empieza siempre por <code>VEREDICTO: PASA</code> o <code>VEREDICTO: NO PASA</code>; lo que pone en "Opcional" no bloquea.</li>
+          </ol>
+          <p>Si sale NO PASA, la lista vuelve al mismo implementador, como mucho 2 vueltas. Si sigue fallando, Claude para y te lo explica. Los agentes están en <code>~/.claude/agents/</code> y se ven con <code>/agents</code>.</p>
+          <p class="ojo">Los subagentes no ven la conversación: en cada encargo Claude les pasa tus palabras, las rutas y el resultado de la fase anterior.</p>
+          <p class="ojo riesgo">Si el cambio toca producción, datos o seguridad, el plan pasa antes por el revisor y espera tu "sí".</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>📁 Los archivos generados, siempre en output/</h3><span class="badge">Recomendado</span></div>
+          <p class="para">encontrar a la primera los informes y exportaciones que hace la IA.</p>
+          <p>Por ejemplo, Claude guarda en <code>output/claude/</code> y Codex en <code>output/codex/</code>; la documentación técnica duradera va en una carpeta de informes aparte.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🕐 Las horas de los runs de Power Automate vienen en UTC</h3><span class="badge">Recomendado</span></div>
+          <p class="para">no tomar por atascado un flujo que va bien.</p>
+          <p>Las API suelen devolver las horas en UTC, no en tu hora local. El portal ya las enseña en hora local, así que, si no cuadran, pídele a Claude que convierta antes de sacar conclusiones.</p>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🔌 Un MCP no conecta al arrancar</h3><span class="badge">Recomendado</span></div>
+          <p class="para">cuando sale un aviso de que un servidor MCP (GitHub, Azure, context7...) no conectó o tardó demasiado.</p>
+          <ol>
+            <li>En una terminal: <code>claude mcp list</code> dice cuáles conectan y cuáles no.</li>
+            <li>Si es por tiempo, sube el límite en <code>~/.claude/settings.json</code>:
+              <div class="code-wrap"><pre>"env": { "MCP_CONNECT_TIMEOUT_MS": "20000" }</pre></div></li>
+            <li>Reinicia la sesión de Claude.</li>
+          </ol>
+        </article>
+
+        <article class="truco">
+          <div class="truco-head"><h3>🧷 Añadí un MCP y en VS Code no aparece</h3><span class="badge">Recomendado</span></div>
+          <p class="para">cuando <code>claude mcp add</code> dice que lo ha añadido pero en el panel no sale.</p>
+          <p>Lo más sencillo: añadirlo para todos los proyectos con <code>claude mcp add -s user ...</code>.</p>
+          <p>Si tiene que ser solo para un proyecto: la terminal lo guarda en <code>~/.claude.json</code> bajo <code>C:/...</code> y VS Code lee <code>c:/...</code> (con minúscula). Hay que copiarlo a la clave con minúscula.</p>
+        </article>
+
+      </div>
+    </section>
+
+    <p class="sin-resultados" id="sin-resultados">No hay trucos que coincidan con la búsqueda.</p>
+
+    <section class="pie">
+      <h2>➕ Cómo añadir un truco</h2>
+      <p>Dile a Claude: <em>"apunta este truco en Trucos: …"</em>, con lo que resuelve, cómo se hace y qué hay que vigilar.</p>
+      <p>La página está en <code>_archivos_por_categoria/web/html/trucos.html</code> y se mantiene a mano (no la regenera ningún script). La insignia <span class="badge">Recomendado</span> se pone solo en los trucos que ya usamos de verdad.</p>
+    </section>
+  </div>
+
+  <script>
+    // Boton "Copiar" en cada bloque de codigo.
+    document.querySelectorAll('.code-wrap').forEach(function (wrap) {
+      var pre = wrap.querySelector('pre');
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'copy-btn';
+      btn.textContent = 'Copiar';
+      btn.addEventListener('click', function () {
+        var texto = pre.textContent;
+        var hecho = function () {
+          btn.textContent = 'Copiado';
+          setTimeout(function () { btn.textContent = 'Copiar'; }, 1500);
+        };
+        var aMano = function () {
+          var area = document.createElement('textarea');
+          area.value = texto;
+          area.style.position = 'fixed';
+          area.style.opacity = '0';
+          document.body.appendChild(area);
+          area.select();
+          try { document.execCommand('copy'); hecho(); } catch (e) { btn.textContent = 'Error'; }
+          document.body.removeChild(area);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(texto).then(hecho, aMano);
+        } else {
+          aMano();
+        }
+      });
+      wrap.appendChild(btn);
+    });
+
+    // Buscador: filtra tarjetas por su texto y oculta las categorias vacias.
+    (function () {
+      var input = document.getElementById('buscar');
+      var contador = document.getElementById('contador');
+      var vacio = document.getElementById('sin-resultados');
+      var tarjetas = Array.prototype.slice.call(document.querySelectorAll('.truco'));
+      var categorias = Array.prototype.slice.call(document.querySelectorAll('.category'));
+      var normalizar = function (s) {
+        return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      };
+      tarjetas.forEach(function (t) { t.dataset.texto = normalizar(t.textContent); });
+
+      function filtrar() {
+        var q = normalizar(input.value.trim());
+        var visibles = 0;
+        tarjetas.forEach(function (t) {
+          var ok = !q || t.dataset.texto.indexOf(q) !== -1;
+          t.style.display = ok ? '' : 'none';
+          if (ok) visibles++;
+        });
+        categorias.forEach(function (c) {
+          var alguna = Array.prototype.some.call(c.querySelectorAll('.truco'), function (t) { return t.style.display !== 'none'; });
+          c.style.display = alguna ? '' : 'none';
+        });
+        contador.textContent = q
+          ? visibles + ' de ' + tarjetas.length + ' trucos'
+          : tarjetas.length + ' trucos';
+        vacio.style.display = visibles ? 'none' : 'block';
+      }
+
+      input.addEventListener('input', filtrar);
+      filtrar();
+    })();
+  </script>
+</body>
+</html>

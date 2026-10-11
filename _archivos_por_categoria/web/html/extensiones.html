@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Extensiones VS Code — Skill Maestra</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 10% 0%, #e8f0ff 0%, #f5f7fb 40%);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: #1f2937;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 0 0 10px 0;
+      color: #0f3460;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: #6b7280;
+      margin: 0;
+    }
+
+    .category {
+      margin-bottom: 40px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      padding: 12px 20px;
+      border-radius: 10px;
+      margin: 0 0 20px 0;
+      font-weight: 600;
+    }
+
+    .category.github h2 { background: #dbeafe; color: #1e40af; }
+    .category.azure h2 { background: #dcfce7; color: #166534; }
+    .category.power h2 { background: #fce7f3; color: #be185d; }
+    .category.languages h2 { background: #fed7aa; color: #92400e; }
+    .category.quality h2 { background: #fbcfe8; color: #9f1239; }
+    .category.git h2 { background: #bfdbfe; color: #1e3a8a; }
+    .category.design h2 { background: #fef3c7; color: #78350f; }
+    .category.utilities h2 { background: #ddd6fe; color: #5b21b6; }
+    .category.debug h2 { background: #e9d5ff; color: #6b21a8; }
+    .category.localization h2 { background: #e2e8f0; color: #334155; }
+
+    .extensions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .extension-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .extension-card:hover {
+      border-color: #0f3460;
+      box-shadow: 0 4px 12px rgba(15,52,96,0.15);
+      transform: translateY(-2px);
+    }
+
+    .ext-name {
+      font-weight: 600;
+      color: #0f3460;
+      margin: 0 0 4px 0;
+      font-size: 0.95rem;
+    }
+
+    .ext-id {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin: 0 0 8px 0;
+    }
+
+    .ext-desc {
+      color: #4b5563;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .ext-desc::before {
+      content: "Utilidad: ";
+      font-weight: 700;
+      color: #0f3460;
+    }
+
+    .ext-links {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .ext-link {
+      display: inline-block;
+      text-decoration: none;
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      color: #0f3460;
+      background: #f8fbff;
+      transition: all .2s ease;
+    }
+
+    .ext-link:hover {
+      background: #e8f1ff;
+      border-color: #0f3460;
+    }
+
+    .ext-link.backup {
+      color: #4b5563;
+      background: #f9fafb;
+      border-color: #d1d5db;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 16px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #1f2937;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      border-color: #0f3460;
+      background: #f0f9ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="./index.html" class="back-btn">← Volver al índice</a>
+
+    <div class="header">
+      <h1>📦 Extensiones VS Code Instaladas</h1>
+      <p class="subtitle">71 extensiones para Skill Maestra — Desarrollo, IA, Cloud y Dataverse</p>
+    </div>
+
+    <!-- GitHub Copilot & IA -->
+    <div class="category github">
+      <h2>GitHub Copilot & IA</h2>
+      <div class="extensions-grid">
+        <div class="extension-card">
+          <p class="ext-name">Claude Code</p>
+          <p class="ext-id">anthropic.claude-code</p>
+          <p class="ext-desc">Agente Claude que lee, edita y ejecuta comandos directamente sobre el proyecto.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">ChatGPT (incluye Codex)</p>
+          <p class="ext-id">openai.chatgpt</p>
+          <p class="ext-desc">Acceso a ChatGPT y al agente de código Codex de OpenAI desde el editor.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Evaluación de Chat Personalizado</p>
+          <p class="ext-id">ms-vscode.vscode-chat-customizations-evaluations</p>
+          <p class="ext-desc">Valida y depura las instrucciones personalizadas de Copilot Chat antes de publicarlas.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">AI Toolkit for VS Code</p>
+          <p class="ext-id">ms-windows-ai-studio.windows-ai-studio</p>
+          <p class="ext-desc">Explora, prueba y despliega modelos de IA (locales o en Foundry) sin salir del editor.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Microsoft Copilot Studio</p>
+          <p class="ext-id">ms-copilotstudio.vscode-copilotstudio</p>
+          <p class="ext-desc">Crea y edita agentes de Copilot Studio directamente desde VS Code.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Azure & Cloud -->
+    <div class="category azure">
+      <h2>Azure & Cloud</h2>
+      <div class="extensions-grid">
+        <div class="extension-card">
+          <p class="ext-name">Azure MCP Server</p>
+          <p class="ext-id">ms-azuretools.vscode-azure-mcp-server</p>
+          <p class="ext-desc">Expone recursos y operaciones de Azure como servidor MCP para agentes de IA.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">GitHub Copilot for Azure</p>
+          <p class="ext-id">ms-azuretools.vscode-azure-github-copilot</p>
+          <p class="ext-desc">Genera y explica infraestructura Azure con ayuda de Copilot.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Azure Load Testing</p>
+          <p class="ext-id">ms-azure-load-testing.microsoft-testing</p>
+          <p class="ext-desc">Diseña y lanza pruebas de carga contra tus aplicaciones Azure.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Azure Developer CLI (azd)</p>
+          <p class="ext-id">ms-azuretools.azure-dev</p>
+          <p class="ext-desc">Integra el flujo azd up/deploy para aprovisionar y desplegar proyectos completos.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Azure App Service</p>
+          <p class="ext-id">ms-azuretools.vscode-azureappservice</p>
+          <p class="ext-desc">Administra, despliega y depura App Services desde el editor.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Azure Container Apps</p>
+          <p class="ext-id">ms-azuretools.vscode-azurecontainerapps</p>
+          <p class="ext-desc">Crea, despliega y monitoriza Container Apps.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Azure Functions</p>
+          <p class="ext-id">ms-azuretools.vscode-azurefunctions</p>
+          <p class="ext-desc">Crea, depura y despliega Azure Functions.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Azure Resources</p>
+          <p class="ext-id">ms-azuretools.vscode-azureresourcegroups</p>
+          <p class="ext-desc">Explora y organiza todos tus recursos Azure por suscripción o grupo.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Azure Static Web Apps</p>
+          <p class="ext-id">ms-azuretools.vscode-azurestaticwebapps</p>
+          <p class="ext-desc">Despliega y gestiona Static Web Apps con su flujo de CI/CD.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Azure Storage</p>
+          <p class="ext-id">ms-azuretools.vscode-azurestorage</p>
+          <p class="ext-desc">Explora blobs, colas, tablas y file shares de Storage Accounts.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Azure Virtual Machines</p>
+          <p class="ext-id">ms-azuretools.vscode-azurevirtualmachines</p>
+          <p class="ext-desc">Crea, conecta y administra máquinas virtuales Azure.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Bicep</p>
+          <p class="ext-id">ms-azuretools.vscode-bicep</p>
+          <p class="ext-desc">Autocompletado, validación y despliegue de plantillas Bicep.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Container Tools</p>
+          <p class="ext-id">ms-azuretools.vscode-containers</p>
+          <p class="ext-desc">Compila, ejecuta y depura contenedores Docker desde VS Code.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Azure Databases (Cosmos DB)</p>
+          <p class="ext-id">ms-azuretools.vscode-cosmosdb</p>
+          <p class="ext-desc">Explora y consulta bases de datos Cosmos DB y otras conexiones NoSQL.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Node Pack for Azure</p>
+          <p class="ext-id">ms-vscode.vscode-node-azure-pack</p>
+          <p class="ext-desc">Paquete de extensiones recomendado para desarrollar apps Node.js en Azure.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Power Platform & Dynamics -->
+    <div class="category power">
+      <h2>Power Platform & Dynamics</h2>
+      <div class="extensions-grid">
+        <div class="extension-card">
+          <p class="ext-name">Power Platform Tools</p>
+          <p class="ext-id">microsoft-isvexptools.powerplatform-vscode</p>
+          <p class="ext-desc">Edita Power Apps, Power Automate y soluciones Dataverse desde VS Code.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Power BI Modeling MCP</p>
+          <p class="ext-id">analysis-services.powerbi-modeling-mcp</p>
+          <p class="ext-desc">Conecta con Power BI Desktop o Fabric para editar modelos semánticos (PBIP/TMDL).</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Dataverse DevTools</p>
+          <p class="ext-id">danish-naglekar.dataverse-devtools</p>
+          <p class="ext-desc">Consulta y gestiona tablas, columnas y datos de Dataverse.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lenguajes & Frameworks -->
+    <div class="category languages">
+      <h2>Lenguajes & Frameworks</h2>
+      <div class="extensions-grid">
+        <div class="extension-card">
+          <p class="ext-name">Python</p>
+          <p class="ext-id">ms-python.python</p>
+          <p class="ext-desc">Soporte base para Python: ejecución, IntelliSense y entornos.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Pylance</p>
+          <p class="ext-id">ms-python.vscode-pylance</p>
+          <p class="ext-desc">Motor de análisis y comprobación de tipos rápido para Python.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">PowerShell</p>
+          <p class="ext-id">ms-vscode.powershell</p>
+          <p class="ext-desc">Edición, depuración y consola integrada para scripts PowerShell.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Svelte for VS Code</p>
+          <p class="ext-id">svelte.svelte-vscode</p>
+          <p class="ext-desc">Soporte oficial de sintaxis e IntelliSense para componentes Svelte.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Svelte Intellisense</p>
+          <p class="ext-id">ardenivanov.svelte-intellisense</p>
+          <p class="ext-desc">Autocompletado adicional para clases y props de Svelte.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Svelte 3 Snippets</p>
+          <p class="ext-id">fivethree.vscode-svelte-snippets</p>
+          <p class="ext-desc">Snippets rápidos para estructuras comunes de Svelte 3.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Node.js Extension Pack</p>
+          <p class="ext-id">1yib.nodejs-bundle</p>
+          <p class="ext-desc">Paquete de extensiones recomendadas para desarrollo Node.js.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Svelte Extension Pack</p>
+          <p class="ext-id">1yib.svelte-bundle</p>
+          <p class="ext-desc">Paquete de extensiones recomendadas para desarrollo Svelte.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Angular Language Service</p>
+          <p class="ext-id">angular.ng-template</p>
+          <p class="ext-desc">IntelliSense y validación para plantillas y componentes Angular.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">C# Dev Kit</p>
+          <p class="ext-id">ms-dotnettools.csdevkit</p>
+          <p class="ext-desc">Explorador de soluciones, testing y depuración para proyectos .NET/C#.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">C#</p>
+          <p class="ext-id">ms-dotnettools.csharp</p>
+          <p class="ext-desc">Soporte de lenguaje base para C# (IntelliSense y depuración).</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">.NET Install Tool</p>
+          <p class="ext-id">ms-dotnettools.vscode-dotnet-runtime</p>
+          <p class="ext-desc">Instala y gestiona automáticamente los runtimes .NET necesarios.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Ballerina</p>
+          <p class="ext-id">wso2.ballerina</p>
+          <p class="ext-desc">Soporte de lenguaje para Ballerina (integraciones y APIs).</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">TOML Language Support</p>
+          <p class="ext-id">be5invis.toml</p>
+          <p class="ext-desc">Resaltado de sintaxis y validación para archivos .toml.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calidad & Linting -->
+    <div class="category quality">
+      <h2>Calidad & Linting</h2>
+      <div class="extensions-grid">
+        <div class="extension-card">
+          <p class="ext-name">ESLint</p>
+          <p class="ext-id">dbaeumer.vscode-eslint</p>
+          <p class="ext-desc">Detecta y corrige problemas de JavaScript/TypeScript en tiempo real.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Prettier</p>
+          <p class="ext-id">esbenp.prettier-vscode</p>
+          <p class="ext-desc">Formatea el código automáticamente al guardar.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Prettier + ESLint</p>
+          <p class="ext-id">rvest.vs-code-prettier-eslint</p>
+          <p class="ext-desc">Combina formateo y linting en una sola pasada.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">JavaScript Standard Style</p>
+          <p class="ext-id">standard.vscode-standard</p>
+          <p class="ext-desc">Linting sin configuración basado en el estilo StandardJS.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">markdownlint</p>
+          <p class="ext-id">davidanson.vscode-markdownlint</p>
+          <p class="ext-desc">Revisa el estilo y detecta errores en archivos Markdown.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Git & Versionado -->
+    <div class="category git">
+      <h2>Git & Versionado</h2>
+      <div class="extensions-grid">
+        <div class="extension-card">
+          <p class="ext-name">GitLens</p>
+          <p class="ext-id">eamodio.gitlens</p>
+          <p class="ext-desc">Blame, historial, comparación de ramas y contexto Git en cada línea.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">GitHub Codespaces</p>
+          <p class="ext-id">github.codespaces</p>
+          <p class="ext-desc">Abre y gestiona entornos de desarrollo en la nube de GitHub.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">GitHub Actions</p>
+          <p class="ext-id">github.vscode-github-actions</p>
+          <p class="ext-desc">Consulta y valida workflows de GitHub Actions desde el editor.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">GitHub Pull Requests</p>
+          <p class="ext-id">github.vscode-pull-request-github</p>
+          <p class="ext-desc">Revisa, comenta y gestiona Pull Requests sin salir de VS Code.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Diseño & Visualización -->
+    <div class="category design">
+      <h2>Diseño & Visualización</h2>
+      <div class="extensions-grid">
+        <div class="extension-card">
+          <p class="ext-name">Pencil (pen.dev)</p>
+          <p class="ext-id">highagency.pencildev</p>
+          <p class="ext-desc">Editor de diseños .pen para interfaces web/mobile coherentes.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">SVG</p>
+          <p class="ext-id">jock.svg</p>
+          <p class="ext-desc">Vista previa y edición asistida de archivos SVG.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">vscode-icons</p>
+          <p class="ext-id">vscode-icons-team.vscode-icons</p>
+          <p class="ext-desc">Iconos personalizados para archivos y carpetas en el explorador.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">GitHub Theme</p>
+          <p class="ext-id">github.github-vscode-theme</p>
+          <p class="ext-desc">Tema visual oficial de GitHub para el editor.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Utilidades & Productividad -->
+    <div class="category utilities">
+      <h2>Utilidades & Productividad</h2>
+      <div class="extensions-grid">
+        <div class="extension-card">
+          <p class="ext-name">Live Server</p>
+          <p class="ext-id">ritwickdey.liveserver</p>
+          <p class="ext-desc">Sirve páginas HTML/CSS/JS locales con recarga automática.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Live Preview</p>
+          <p class="ext-id">ms-vscode.live-server</p>
+          <p class="ext-desc">Vista previa integrada de páginas web sin salir de VS Code.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Surround</p>
+          <p class="ext-id">yatki.vscode-surround</p>
+          <p class="ext-desc">Envuelve selecciones de texto en etiquetas o símbolos rápidamente.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Rainbow CSV</p>
+          <p class="ext-id">mechatroner.rainbow-csv</p>
+          <p class="ext-desc">Colorea columnas de archivos CSV/TSV para leerlos de un vistazo.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">VS Code Speech</p>
+          <p class="ext-id">ms-vscode.vscode-speech</p>
+          <p class="ext-desc">Dictado por voz y comandos de voz dentro del editor.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">HTML CSS Support</p>
+          <p class="ext-id">ecmel.vscode-html-css</p>
+          <p class="ext-desc">Autocompletado de clases e IDs CSS dentro de archivos HTML.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">HTML CSS Class Completion</p>
+          <p class="ext-id">zignd.html-css-class-completion</p>
+          <p class="ext-desc">Sugiere clases CSS ya existentes al escribir HTML.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">HTML Preview</p>
+          <p class="ext-id">george-alisson.html-preview-vscode</p>
+          <p class="ext-desc">Vista previa rápida de archivos HTML en un panel lateral.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Microsoft Edge Tools</p>
+          <p class="ext-id">ms-edgedevtools.vscode-edge-devtools</p>
+          <p class="ext-desc">Depura páginas web con las herramientas de desarrollo de Edge integradas.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">REST API Client</p>
+          <p class="ext-id">unjinjang.rest-api-client</p>
+          <p class="ext-desc">Envía peticiones HTTP y revisa respuestas sin salir del editor.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Hurl Client</p>
+          <p class="ext-id">wso2.hurl-client</p>
+          <p class="ext-desc">Ejecuta y organiza pruebas de API escritas en formato Hurl.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">vscode-pdf</p>
+          <p class="ext-id">tomoki1207.pdf</p>
+          <p class="ext-desc">Abre y visualiza archivos PDF directamente en una pestaña del editor.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Skill Maestra Viewer</p>
+          <p class="ext-id">local.skill-maestra-viewer</p>
+          <p class="ext-desc">Extensión local propia del proyecto para visualizar skills y scripts de Skill Maestra.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Análisis & Debug -->
+    <div class="category debug">
+      <h2>Análisis & Debug</h2>
+      <div class="extensions-grid">
+        <div class="extension-card">
+          <p class="ext-name">Python Debugger</p>
+          <p class="ext-id">ms-python.debugpy</p>
+          <p class="ext-desc">Breakpoints, inspección de variables y evaluación inline.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Python Environments</p>
+          <p class="ext-id">ms-python.vscode-python-envs</p>
+          <p class="ext-desc">Alterna entre venv, conda o poetry fácilmente.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">SARIF Viewer</p>
+          <p class="ext-id">ms-sarifvscode.sarif-viewer</p>
+          <p class="ext-desc">Muestra resultados de análisis estático (SARIF) de forma visual.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">CodeQL</p>
+          <p class="ext-id">github.vscode-codeql</p>
+          <p class="ext-desc">Analiza el código en busca de vulnerabilidades de seguridad.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Error Lens</p>
+          <p class="ext-id">usernamehw.errorlens</p>
+          <p class="ext-desc">Resalta errores y warnings directamente en la línea de código.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">Debugger for Firefox</p>
+          <p class="ext-id">firefox-devtools.vscode-firefox-debug</p>
+          <p class="ext-desc">Depura aplicaciones web ejecutándose en Firefox.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Localización -->
+    <div class="category localization">
+      <h2>Localización</h2>
+      <div class="extensions-grid">
+        <div class="extension-card">
+          <p class="ext-name">Spanish Language Pack</p>
+          <p class="ext-id">ms-ceintl.vscode-language-pack-es</p>
+          <p class="ext-desc">Traduce la interfaz de VS Code al español.</p>
+        </div>
+        <div class="extension-card">
+          <p class="ext-name">VS Code Speech (Español)</p>
+          <p class="ext-id">ms-vscode.vscode-speech-language-pack-es-es</p>
+          <p class="ext-desc">Añade reconocimiento de voz en español a la extensión de dictado.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+      const cards = document.querySelectorAll('.extension-card');
+      const idRegex = /[a-z0-9][a-z0-9-]*\.[a-z0-9][a-z0-9.-]*/gi;
+
+      cards.forEach((card) => {
+        const idEl = card.querySelector('.ext-id');
+        if (!idEl) return;
+
+        const raw = idEl.textContent || '';
+        const ids = Array.from(new Set((raw.match(idRegex) || []).map((v) => v.toLowerCase())));
+        if (!ids.length) return;
+
+        const links = document.createElement('div');
+        links.className = 'ext-links';
+
+        ids.forEach((id) => {
+          const direct = document.createElement('a');
+          direct.className = 'ext-link';
+          direct.href = 'https://marketplace.visualstudio.com/items?itemName=' + encodeURIComponent(id);
+          direct.target = '_blank';
+          direct.rel = 'noopener noreferrer';
+          direct.textContent = 'Abrir ' + id;
+
+          const backup = document.createElement('a');
+          backup.className = 'ext-link backup';
+          backup.href = 'https://marketplace.visualstudio.com/search?term=' + encodeURIComponent(id) + '&target=VSCode&category=All%20categories&sortBy=Relevance';
+          backup.target = '_blank';
+          backup.rel = 'noopener noreferrer';
+          backup.textContent = 'Buscar ' + id;
+
+          links.appendChild(direct);
+          links.appendChild(backup);
+        });
+
+        card.appendChild(links);
+      });
+    })();
+  </script>
+</body>
+</html>

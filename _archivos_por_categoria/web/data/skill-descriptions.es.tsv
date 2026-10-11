@@ -1,0 +1,15 @@
+Name	Title	Purpose
+agent-customization	Configurar cómo trabaja la IA	Crea y revisa las instrucciones, prompts y perfiles que sigue el agente en tus proyectos.
+code-app	Crear aplicaciones con código en Power Apps	Construye y despliega Code Apps con conexiones, planificación y validación de la aplicación.
+codex-computer-use	Configurar el control del ordenador	Diagnostica y configura el uso de aplicaciones de escritorio desde Codex.
+design-md	Definir el estilo visual de una aplicación	Documenta colores, tipografía y componentes para que la IA mantenga un diseño coherente.
+find-skills	Buscar una skill para una tarea	Localiza skills existentes cuando quieras ampliar capacidades o encontrar una herramienta adecuada.
+frontend-design	Diseñar una web clara y cuidada	Define la presentación visual y construye interfaces con tipografía, distribución y estilo coherentes.
+gh-address-comments	Atender comentarios de una revisión en GitHub	Consulta los comentarios de una propuesta de cambios y ayuda a resolverlos.
+gh-fix-ci	Arreglar comprobaciones fallidas de GitHub	Investiga errores de GitHub Actions y prepara las correcciones necesarias.
+model-driven-apps	Crear páginas para aplicaciones de Dataverse	Construye y despliega páginas generativas dentro de aplicaciones basadas en modelos.
+power-bi-modeling-mcp-server	Configurar la edición de modelos de Power BI	Instala y utiliza herramientas para trabajar con el modelo semántico de Power BI desde el agente.
+security-best-practices	Revisar la seguridad del código	Analiza prácticas de seguridad del lenguaje y framework y propone mejoras.
+security-threat-model	Analizar posibles amenazas de una aplicación	Identifica activos, puntos de entrada, escenarios de abuso y medidas de protección.
+skill-creator	Crear una nueva skill reutilizable	Prepara una skill con instrucciones y estructura para que el agente pueda descubrirla y utilizarla.
+webapp-testing	Probar una aplicación web en el navegador	Comprueba interacciones, captura pantallas y revisa errores de consola mediante Playwright.

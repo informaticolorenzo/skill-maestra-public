@@ -1,0 +1,27 @@
+/* Estilo comun de las paginas por tipo: plugins, mcp, hooks y mods.
+   Misma paleta que trucos.html. Pagina mantenida a mano. */
+* { box-sizing: border-box; }
+body { margin: 0; background: radial-gradient(circle at 10% 0%, #e8f0ff 0%, #f5f7fb 40%); font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; color: #1f2937; padding: 20px; }
+.container { max-width: 1100px; margin: 0 auto; }
+.back-btn { display: inline-block; margin-bottom: 16px; padding: 10px 16px; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; text-decoration: none; color: #1f2937; font-size: .9rem; }
+.back-btn:hover { border-color: #0f3460; background: #f0f9ff; }
+.tipos-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+.tipos-nav a { padding: 8px 14px; border-radius: 999px; background: #fff; border: 1px solid #d7e1ef; color: #0f3460; text-decoration: none; font-size: .9rem; font-weight: 600; }
+.tipos-nav a:hover { background: #f0f9ff; border-color: #0f3460; }
+.tipos-nav a.actual { background: #0f3460; color: #fff; border-color: #0f3460; }
+h1 { font-size: 2.2rem; margin: 0 0 8px; color: #0f3460; }
+.lead { font-size: 1.1rem; color: #374151; margin: 0 0 6px; line-height: 1.5; }
+.lead strong { color: #0f3460; }
+.nota { font-size: .92rem; color: #6b7280; margin: 0 0 24px; line-height: 1.5; }
+.diferencia { background: #fff; border: 1px solid #d7e1ef; border-left: 4px solid #0f3460; border-radius: 10px; padding: 12px 16px; margin: 0 0 28px; font-size: .92rem; line-height: 1.5; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.ficha { background: #fff; border: 1px solid #d7e1ef; border-radius: 12px; padding: 16px 18px; }
+.ficha h3 { margin: 0 0 6px; font-size: 1.1rem; color: #0f3460; }
+.ficha p { margin: 0 0 10px; line-height: 1.5; font-size: .93rem; }
+.ficha dl { margin: 0; font-size: .85rem; color: #4b5563; }
+.ficha dt { font-weight: 700; float: left; clear: left; margin-right: 6px; }
+.ficha dd { margin: 0 0 3px; overflow-wrap: anywhere; }
+.etiqueta { display: inline-block; font-size: .75rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #e0ecff; color: #0f3460; margin-bottom: 8px; }
+.etiqueta.pausa { background: #fef3c7; color: #92400e; }
+code { background: #eef2f7; padding: 1px 5px; border-radius: 4px; font-size: .85em; }
+h2 { color: #0f3460; margin: 32px 0 12px; font-size: 1.3rem; }

@@ -1,0 +1,25 @@
+# Sistema y editor
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+*.code-workspace
+
+# Temporales y compilados
+*.tmp
+*.bak
+*.log
+tmp/
+node_modules/
+*.vsix
+
+# Secretos y configuración local (nunca al repositorio)
+.env
+.env.*
+local.settings.json
+secrets.json
+credentials.json
+*.session
+.vscode/settings.json
+.vscode/mcp.json
