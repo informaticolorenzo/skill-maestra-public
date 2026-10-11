@@ -89,7 +89,7 @@ open-skill-maestra-web.ps1
 
 ## Licencia
 
-MIT para el código y contenido propio. Las skills de terceros conservan su licencia en el `LICENSE.txt` de cada carpeta.
+MIT para el código y contenido propio. Las skills de terceros conservan su licencia en el `LICENSE.txt` de cada carpeta; la lista está en [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
 
 ## Cómo contribuir
 
