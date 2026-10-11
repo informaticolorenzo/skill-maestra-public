@@ -1,0 +1,30 @@
+name: Proponer una skill o un truco
+description: Una skill, un truco o una mejora del catálogo que te gustaría ver.
+labels: ["propuesta"]
+body:
+  - type: input
+    id: nombre
+    attributes:
+      label: Nombre propuesto
+      placeholder: "mi-skill-en-kebab-case"
+    validations:
+      required: true
+  - type: textarea
+    id: para-que
+    attributes:
+      label: Qué problema resuelve y para quién
+    validations:
+      required: true
+  - type: textarea
+    id: ejemplo
+    attributes:
+      label: Ejemplo de petición al agente
+      description: La frase que alguien pegaría en el chat para usarla.
+  - type: dropdown
+    id: licencia
+    attributes:
+      label: Origen
+      options:
+        - La escribiría yo (licencia MIT)
+        - Es de terceros con licencia que permite redistribuirla (indica cuál)
+        - No lo sé

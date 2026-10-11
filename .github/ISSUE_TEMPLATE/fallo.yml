@@ -1,0 +1,31 @@
+name: Informar de un fallo
+description: Algo no funciona como debería en la web, el catálogo o un script.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: que-pasa
+    attributes:
+      label: Qué pasa
+      description: Describe el problema y qué esperabas que ocurriera.
+    validations:
+      required: true
+  - type: textarea
+    id: pasos
+    attributes:
+      label: Cómo reproducirlo
+      placeholder: |
+        1. Abro...
+        2. Ejecuto...
+        3. Veo...
+    validations:
+      required: true
+  - type: input
+    id: entorno
+    attributes:
+      label: Entorno
+      placeholder: "Windows 11, PowerShell 7.4, VS Code 1.9x, Live Preview"
+  - type: textarea
+    id: extra
+    attributes:
+      label: Capturas o salida de la consola
+      description: Antes de pegar nada, quita rutas con tu usuario, correos o claves.

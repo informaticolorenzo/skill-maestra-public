@@ -1,6 +1,17 @@
 # Skill Maestra
 
+[![Licencia MIT](https://img.shields.io/badge/licencia-MIT-green.svg)](LICENSE)
+[![PowerShell](https://img.shields.io/badge/PowerShell-5.1%20%7C%207-blue.svg)](#cómo-empezar)
+[![Claude Code · Codex · Copilot](https://img.shields.io/badge/agentes-Claude%20Code%20%C2%B7%20Codex%20%C2%B7%20Copilot-8a2be2.svg)](#qué-incluye)
+[![En español](https://img.shields.io/badge/idioma-espa%C3%B1ol-orange.svg)](#)
+
 Cuadro de mandos local, en español, para gestionar tus herramientas de IA en VS Code: skills, comandos del chat, extensiones, trucos de Claude Code y las instrucciones que siguen los agentes (Claude, Codex, Copilot).
+
+![Portada del cuadro de mandos de Skill Maestra](docs/captura-portada.png)
+
+## Por qué existe
+
+Cuando empiezas a usar agentes de IA en serio acumulas decenas de skills, comandos y extensiones, cada una con su nombre técnico y su README en inglés. Al poco tiempo ya no recuerdas qué tienes ni para qué sirve. Skill Maestra nace de esa necesidad: una web local que lo lista todo, lo explica en lenguaje llano y te da un ejemplo listo para pegar en el chat. La hice para mi propio trabajo diario y la comparto por si te ahorra el mismo camino.
 
 Todo es HTML estático más un script de PowerShell que regenera el catálogo leyendo las skills instaladas. No necesita cuenta, servidor ni dependencias.
 
@@ -21,7 +32,7 @@ Requisitos: Windows con PowerShell (5.1 o 7) y VS Code. Opcional: extensión **L
 
 ```powershell
 git clone https://github.com/informaticolorenzo/skill-maestra-public.git
-cd skill-maestra
+cd skill-maestra-public
 
 # Regenerar el catálogo con las skills del repositorio y las de tu carpeta global (~/.agents/skills)
 pwsh -File _archivos_por_categoria\scripts\ps1\Update-SkillMaestraWebIndex.ps1
@@ -79,3 +90,16 @@ open-skill-maestra-web.ps1
 ## Licencia
 
 MIT para el código y contenido propio. Las skills de terceros conservan su licencia en el `LICENSE.txt` de cada carpeta.
+
+## Cómo contribuir
+
+Las propuestas son bienvenidas: una skill nueva, un truco, una corrección del catálogo. Lee [CONTRIBUTING.md](CONTRIBUTING.md) para ver cómo enviarlas y [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) para las normas de convivencia. Para avisar de un problema de seguridad, sigue [SECURITY.md](SECURITY.md).
+
+## Autor
+
+**Lorenzo Martín Ramírez** · Desarrollador especializado en soluciones low code (Power Platform, Velneo) y en el uso de agentes de IA en el trabajo diario. Granada, España.
+
+- GitHub: [@informaticolorenzo](https://github.com/informaticolorenzo)
+- LinkedIn: [lorenzo-martin-low-code](https://www.linkedin.com/in/lorenzo-martin-low-code)
+
+Si el proyecto te resulta útil, una estrella ⭐ en GitHub ayuda a que lo encuentre más gente.
