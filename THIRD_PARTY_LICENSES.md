@@ -2,7 +2,7 @@
 
 El código y contenido propio de Skill Maestra es MIT (ver [LICENSE](LICENSE)). Estas skills incluidas en `.github/skills/` son de terceros y conservan su licencia original en el `LICENSE.txt` de su carpeta:
 
-- `frontend-design`: 
+- `frontend-design`: Apache License, Version 2.0
 - `gh-address-comments`: Apache License, Version 2.0
 - `gh-fix-ci`: Apache License, Version 2.0
 - `security-best-practices`: Apache License, Version 2.0
