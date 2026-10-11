@@ -20,7 +20,7 @@ Todo es HTML estático más un script de PowerShell que regenera el catálogo le
 Requisitos: Windows con PowerShell (5.1 o 7) y VS Code. Opcional: extensión **Live Preview** (`ms-vscode.live-server`).
 
 ```powershell
-git clone https://github.com/informaticolorenzo/skill-maestra.git
+git clone https://github.com/informaticolorenzo/skill-maestra-public.git
 cd skill-maestra
 
 # Regenerar el catálogo con las skills del repositorio y las de tu carpeta global (~/.agents/skills)
